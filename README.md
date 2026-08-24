@@ -27,7 +27,9 @@ follow them.
 - [Features](#features)
 - [Getting Started](#getting-started)
 - [Core Symbols](#core-symbols)
+- [Label References](#label-references)
 - [Example](#example)
+- [Reference Parser](#reference-parser)
 - [Documentation](#documentation)
 - [Versioning](#versioning)
 - [Contributing](#contributing)
@@ -52,6 +54,9 @@ follow them.
 - **Advisory, not enforced** — directives are guidance to the interpreting
   model; anything requiring a hard guarantee must still be validated outside
   the model.
+- **Structural label references** — `{label}` / `{label}.field` name a prior
+  `^`/`|` entry's output unambiguously, with parse-time validation, instead
+  of relying on prose alone.
 
 ## Getting Started
 
@@ -60,7 +65,7 @@ nothing to install. To use it:
 
 1. Give the interpreting model the Consort system prompt so it knows how to
    parse the syntax. The current version is
-   [`Consort 0.11 system prompt.txt`](<Consort 0.11 system prompt.txt>) —
+   [`Consort 0.12 system prompt.txt`](<Consort 0.12 system prompt.txt>) —
    paste its contents into your AI assistant's system prompt, or prepend it
    to a one-off conversation.
 2. Write prompts using the Consort symbols described below, mixed freely
@@ -86,6 +91,29 @@ nothing to install. To use it:
 All eight symbols are stable. `&` (Examples), `~` (Style/Tone), and `+`
 (Extras) were retired in v0.10 and are no longer part of the language.
 
+## Label References
+
+`{label}` and `{label}.field` — new in v0.12 — are a structural token for
+naming a prior `^`/`|` entry's output, usable inside `|` stage task
+descriptions, inline overrides (`/$` `/%` `/@` `/*`), and `for-each`'s
+source position:
+
+```
+| finalizer: rewrite {drafter}'s draft addressing {reviewer}'s
+  feedback, but keep {drafter}.examples verbatim
+```
+
+They are not required — prose naming a label is still valid and resolved
+on a best-effort basis — but a label reference is unambiguous and
+parse-time validated: an undefined or forward-referenced label is an
+error, and a reference between sibling `^` entries in the same fan-out is
+also an error, since `^` entries are independent by definition. Like
+every other Consort directive, a resolved label reference only guarantees
+*which* content is meant — not that the receiving entry complies with
+what it's told to do with it. See Section 2.11 of the
+[full specification](<Consort 0.12 system prompt.txt>) for the complete
+grammar, escaping (`\{`), and edge cases.
+
 ## Example
 
 ```
@@ -104,18 +132,35 @@ rules; `%` fixes the output shape; `@` sets a warm home-cook persona; `*`
 keeps each course description short.
 
 More worked examples — including framed form, `^` delegation, `|` pipelines,
-nested fan-out, and generator (`for-each`) entries — are in Section 7 of the
-[full specification](<Consort 0.11 system prompt.txt>).
+nested fan-out, generator (`for-each`) entries, and `{label}` references —
+are in Section 7 of the
+[full specification](<Consort 0.12 system prompt.txt>).
+
+## Reference Parser
+
+A Python reference implementation of `{label}` / `{label}.field` label
+references lives in [`parser/`](parser/), covering entry parsing
+(`^`/`|`/`for-each`), inline overrides, and reference resolution
+(undefined labels, forward references, sibling-`^` dependency checks,
+escaping, and non-matching braces). It exists to validate the Section 2.11
+grammar against concrete inputs, not as a full production Consort parser.
+
+```
+pip install pytest
+pytest parser
+```
+
+See [`parser/README.md`](parser/README.md) for details.
 
 ## Documentation
 
 The complete, authoritative specification — directive-by-directive rules,
 parsing rules, response behavior, edge cases, and the version changelog — is
-in [`Consort 0.11 system prompt.txt`](<Consort 0.11 system prompt.txt>).
+in [`Consort 0.12 system prompt.txt`](<Consort 0.12 system prompt.txt>).
 
 ## Versioning
 
-Consort is currently at **v0.11**. Per the versioning rule adopted at v0.11,
+Consort is currently at **v0.12**. Per the versioning rule adopted at v0.11,
 the version number changes whenever a valid Consort string's meaning
 changes (a new construct, a new symbol, or a parsing fix); pure
 documentation changes do not bump the version. See Section 8 of the spec
@@ -131,7 +176,7 @@ own grammar as a deliberate, versioned decision (see
 
 ## License
 
-CONSORT Structured English for AI (0.11)
+CONSORT Structured English for AI (0.12)
 Copyright © 2026 Michael Herman (Bindloss, Alberta, Canada)
 
 Released under the [MIT License](LICENSE).
