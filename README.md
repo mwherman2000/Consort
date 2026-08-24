@@ -138,12 +138,16 @@ are in Section 7 of the
 
 ## Reference Parser
 
-A Python reference implementation of `{label}` / `{label}.field` label
-references lives in [`parser/`](parser/), covering entry parsing
-(`^`/`|`/`for-each`), inline overrides, and reference resolution
-(undefined labels, forward references, sibling-`^` dependency checks,
-escaping, and non-matching braces). It exists to validate the Section 2.11
-grammar against concrete inputs, not as a full production Consort parser.
+A Python reference implementation of the Consort grammar lives in
+[`parser/`](parser/): top-level directives (with multi-line loose-form
+scanning), `^`/`|` entries with nested `^` and inline overrides,
+`for-each` generators with `%item-var%` interpolation, `{label}` /
+`{label}.field` label references (Section 2.11 — undefined/forward/
+sibling-`^` validation, escaping, non-matching braces), framed-form
+byte-exact payloads (Section 2.10), and structural checks like agent-label
+uniqueness. Runtime/response-behavior rules for the interpreting model
+(concurrency, halt-on-failure, conflict precedence) are out of scope, since
+they aren't checkable against a single message in isolation.
 
 ```
 pip install pytest
