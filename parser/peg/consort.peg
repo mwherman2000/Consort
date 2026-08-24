@@ -1,0 +1,107 @@
+# ============================================================================
+# consort.peg -- PEG grammar for the Consort Prompt DSL (spec v0.12)
+# ============================================================================
+#
+# Written in Parsimonious's PEG dialect (https://github.com/erikrose/parsimonious):
+# "=" defines a rule, "/" is ordered choice, ~"regex" is a regex terminal,
+# "*" "+" "?" are the usual PEG repetition operators, "&" / "!" are positive
+# / negative lookahead, and juxtaposition is sequencing. This file is loaded
+# directly by peg_parser.py via parsimonious.grammar.Grammar and is the
+# single source of truth for the grammar -- there is no separate,
+# possibly-divergent "documentation-only" grammar sitting next to it.
+#
+# FRAMED FORM (spec Section 2.10) is deliberately NOT expressed here. A
+# symbol's length-prefixed, byte-exact payload is a data-dependent
+# ("context-sensitive") construct -- the number of bytes to consume is
+# itself part of the input, not a fixed grammar shape -- which context-free
+# PEG cannot express directly, the same reason Python's own INDENT/DEDENT
+# structure is resolved by a lexer pass before its CFG ever sees it, or a
+# Netstring's length prefix is consumed before its payload is handed to
+# whatever parses that payload's contents. peg_parser.py resolves every
+# framed-form span with such a preprocessing pass before this grammar is
+# ever invoked; by the time `message` sees the text, a framed segment has
+# already become an ordinary, unindented "label: task" or "symbol value"
+# logical line, indistinguishable at this grammar's level from a hand-typed
+# loose-form one (its task text is, however, kept opaque afterwards and
+# never handed to `content` or `task_with_overrides` below -- see 2.10's
+# opacity guarantee, enforced in peg_parser.py, not in this file).
+#
+# The grammar is used at two layers, invoked as two different start rules
+# against two different kinds of input string:
+#
+#   LAYER 1 -- start rule `single_line`: classifies one physical line
+#   (indentation + content, already newline-terminated) of the
+#   framed-form-resolved message as blank, escaped, a bare-symbol line
+#   (starts a directive or an entry, at any indentation), or a
+#   continuation line (Section 3's loose-form scanning rules).
+#
+#   LAYER 2 -- once a directive's or entry's lines have been assembled
+#   into one raw string (peg_parser.py's job: a stateful "which
+#   construct is currently open" accumulation that -- like the
+#   INDENT/DEDENT problem above -- doesn't have a clean context-free PEG
+#   expression), these rules parse that string's own inner structure:
+#     - `entry_body`: splits <agent-label> ":" <task> (Section 2.8 --
+#       the label cannot contain a colon, "escaped or otherwise").
+#     - `for_each_header`: parses a for-each entry's
+#       "for-each <item-var> in {label}[.field]" header (Section 2.8).
+#     - `task_with_overrides`: splits inline /$ /% /@ /* overrides out
+#       of a task or context/constraint value (Section 2.8/2.9).
+#     - `content`: tokenizes free text into { } LABEL REFERENCES,
+#       escaped braces, and plain runs (Section 2.11).
+# ============================================================================
+
+# ---- Layer 1: physical-line classification (Section 3) -------------------
+
+single_line         = blank_line / escaped_line / symbol_line / continuation_line
+
+blank_line          = indent "\n"
+escaped_line        = indent "\\" &top_symbol rest "\n"
+symbol_line         = indent top_symbol rest "\n"
+continuation_line   = !blank_line !symbol_line !escaped_line indent rest "\n"
+
+indent              = ~"[ ]*"
+top_symbol          = "!" / "#" / "$" / "%" / "*" / "@" / "^" / "|"
+rest                = ~"[^\n]*"
+
+# ---- Layer 2a: entry_body -- <agent-label> ":" <task> (Section 2.8) ------
+
+entry_body          = label ":" ws0 task_rest
+label               = ~"[^:\n]+"
+task_rest           = ~"[\s\S]*"
+
+# ---- Layer 2b: for-each's header (Section 2.8) ----------------------------
+
+for_each_header     = "for-each" ws1 item_var ws1 "in" ws1 label_ref_only
+item_var            = label_chars
+
+# ---- Layer 2c: { } LABEL REFERENCES and \{ escaping (Section 2.11) -------
+
+content             = token*
+token               = escaped_brace / label_ref / plain_run / other_char
+escaped_brace       = "\\{"
+label_ref           = "{" label_chars "}" ("." field_chars)?
+label_ref_only      = label_ref
+label_chars         = ~"[A-Za-z0-9_-]+"
+field_chars         = ~"[A-Za-z0-9_-]+"
+plain_run           = ~"[^{\\\\]+"
+other_char          = ~"."
+
+# ---- Layer 2d: inline overrides /$ /% /@ /* (Section 2.8/2.9) ------------
+#
+# task_with_overrides expects its input to have been padded with one
+# leading space by the caller (peg_parser.py's split_overrides()), so that
+# an override at the very start of the real text still satisfies
+# override_start's "preceded by whitespace" requirement uniformly, instead
+# of needing a separate start-of-string alternative.
+
+task_with_overrides = base_run overrides
+overrides           = override*
+base_run            = (!override_start any_char)*
+override            = override_start ws0 value_run
+override_start      = ws1 "/" override_symbol boundary
+override_symbol     = "$" / "%" / "@" / "*"
+value_run           = (!override_start any_char)*
+boundary            = ~"(?=[ \t]|$)"
+any_char            = ~"."
+ws0                 = ~"[ \t]*"
+ws1                 = ~"[ \t]+"

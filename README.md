@@ -148,6 +148,10 @@ byte-exact payloads (Section 2.10), and structural checks like agent-label
 uniqueness. Runtime/response-behavior rules for the interpreting model
 (concurrency, halt-on-failure, conflict precedence) are out of scope, since
 they aren't checkable against a single message in isolation.
+[`parser/peg/`](parser/peg/) is a second, independent implementation of
+the same grammar driven by an actual `.peg` grammar file (loaded via
+[Parsimonious](https://github.com/erikrose/parsimonious)) instead of
+hand-written regexes, cross-checked against the same worked examples.
 
 ```
 pip install pytest

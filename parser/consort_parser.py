@@ -555,3 +555,22 @@ def parse(text: str) -> ParsedMessage:
     references = _resolve_references(entries)
     warnings = _collect_warnings(entries)
     return ParsedMessage(directives=directives, entries=entries, references=references, warnings=warnings)
+
+
+# --------------------------------------------------------------------------
+# Public aliases for reuse by parser.peg (parser/peg/peg_parser.py).
+#
+# The PEG-based parser builds its own Entry/LabelReference objects via a
+# grammar-driven pipeline (see parser/peg/consort.peg) instead of this
+# module's regex/state-machine-based one -- but "is this reference valid",
+# "are these labels unique", "does this message need a top-level !" are
+# the same structural rules regardless of which parser produced the
+# entries, so they're shared here rather than reimplemented a second time.
+# --------------------------------------------------------------------------
+
+validate_message_shape = _validate_message_shape
+validate_reference = _validate_reference
+resolve_references = _resolve_references
+collect_warnings = _collect_warnings
+scan_logical_lines = _scan_logical_lines  # byte-accurate framed-form extraction (2.10)
+LogicalLine = _LogicalLine

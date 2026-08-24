@@ -34,6 +34,28 @@ and anything requiring a prior entry's actual runtime output (verifying a
 label reference told it to do — 2.11's "parsing rigor, not semantic
 rigor" principle).
 
+## PEG grammar
+
+[`peg/`](peg/) is a second, independent implementation of the same
+grammar, driven by an actual [PEG](https://en.wikipedia.org/wiki/Parsing_expression_grammar)
+grammar file — [`peg/consort.peg`](peg/consort.peg), loaded at runtime via
+[Parsimonious](https://github.com/erikrose/parsimonious) — rather than the
+hand-written regexes and string checks above. It covers the same ground
+(line classification, label:task splitting, overrides, `for-each`
+headers, and `{ }` label-reference tokenization) using grammar rules
+instead, reuses this module's *validation* logic (agent-label uniqueness,
+reference resolution, etc. — the same rule regardless of which parser
+found the entries), and cross-checks against the same worked examples in
+its own test suite. See [`peg/README.md`](peg/README.md) for what is and
+isn't expressed as PEG rules, and why (framed form's byte-exact length
+prefix, and the stateful "what's currently open" bookkeeping Section 2.9
+needs, are both explained there).
+
+```
+pip install -r parser/peg/requirements.txt
+pytest parser/peg
+```
+
 ## Usage
 
 ```python
