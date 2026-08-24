@@ -85,6 +85,15 @@ document order.
 From the repository root:
 
 ```
-pip install pytest
+pip install pytest -r parser/peg/requirements.txt
 pytest parser
 ```
+
+`parsimonious` is required even for this plain run: `parser/tests` also
+contains `test_spec_examples.py` (all seven worked examples from Section 7
+of the spec, run verbatim) and `test_edge_cases.py`, both parametrized to
+run every case through *both* this module's `parse()` and
+[`parser.peg`](peg/)'s `parse()` and assert they agree, so they import
+`parser.peg` unconditionally. To run only this module's own suite without
+installing `parsimonious`, target the individual files directly, e.g.
+`pytest parser/tests/test_label_references.py parser/tests/test_full_dsl.py`.

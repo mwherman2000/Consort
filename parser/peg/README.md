@@ -86,10 +86,16 @@ meant to agree on every input.
 From the repository root:
 
 ```
-pip install -r parser/peg/requirements.txt
+pip install pytest -r parser/peg/requirements.txt
 pytest parser/peg
 ```
 
-`parser/peg/tests/test_peg_parser.py` runs the same worked examples and
-edge cases as [`parser/tests`](../tests/) through this grammar-driven
-pipeline instead, as a cross-check that the two implementations agree.
+`parser/peg/tests/test_peg_parser.py` is this package's own standalone
+suite, mirroring the label-reference and full-grammar cases from
+[`parser/tests`](../tests/) through this grammar-driven pipeline. The
+stronger cross-check lives one level up, in
+[`parser/tests/test_spec_examples.py`](../tests/test_spec_examples.py)
+and [`parser/tests/test_edge_cases.py`](../tests/test_edge_cases.py):
+those run every case through *both* `consort_parser.parse()` and this
+package's `parse()` and assert the two agree — run `pytest parser` from
+the repository root to include them.

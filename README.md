@@ -154,9 +154,13 @@ the same grammar driven by an actual `.peg` grammar file (loaded via
 hand-written regexes, cross-checked against the same worked examples.
 
 ```
-pip install pytest
+pip install pytest -r parser/peg/requirements.txt
 pytest parser
 ```
+
+(`parsimonious` is required even for the plain `pytest parser` run above —
+`parser/tests` cross-checks both parser implementations against each
+other, so it imports `parser.peg` unconditionally.)
 
 See [`parser/README.md`](parser/README.md) for details.
 
