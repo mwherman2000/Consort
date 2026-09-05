@@ -10,6 +10,8 @@
 > Real-World Parallel
 > Think of a fully automated, next-generation smart factory or airport.The Human provides the strategic intent (e.g., "Prioritize flight turnaround time safely").The Software (AI/Algorithms) dynamically optimizes routes, baggage handling schedules, and fueling queues based on real-time data streams.The Machines (Autonomous vehicles, robotic gates) execute the physical tasks safely alongside humans.Without a common operational frame of reference, these layers function as disconnected silos. With it, they become an integrated, high-performing orchestra.
 
+## Consort is Markdown for intelligence and coordination.
+
 Consort is a minimal, symbol-based structured prompt
 language designed for clarity, density, and reduced ambiguity — distinct
 voices, each with a distinct role, combining into one coherent prompt. It is
