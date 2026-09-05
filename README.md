@@ -2,6 +2,14 @@
 
 <img width="1536" height="1024" alt="Consort Logo 0 12" src="https://github.com/user-attachments/assets/5e793046-f74c-4aba-bd0e-a575def34e26" style="max-width: 100%; height: auto;" />
 
+> Consort enables humans, software and machines to participate in a common world by providing a shared conceptual and operational frame of reference for action.        
+> That is a powerful framework for thinking about the future of cyber-physical-social systems and interoperability. By creating a unified conceptual and operational frame of reference, Consort bridges the semantic gap between human intent, programmatic execution (software), and mechanical operation (machines).
+> This approach solves a fundamental bottleneck in modern technology: fragmentation. Usually, humans think in goals and values, software processes data and logic, and machines handle physics and execution.
+> Why a Shared Frame of Reference Matters
+> Shared Conceptual Understanding: It acts as a universal translator or conceptual reference model, establishing an ontology where terms, states, and intentions mean the exact same thing to a human manager, an AI agent, and a robotic actuator. (https://www.sciencedirect.com/topics/computer-science/shared-context), (https://www.cutter.com/article/making-connection-conceptual-reference-models-497266)Operational Alignment: It ensures that when a decision is made, the subsequent digital processes and mechanical actions happen in harmony. There is no "loss in translation" from the high-level plan down to the physical execution. (https://pmc.ncbi.nlm.nih.gov/articles/PMC12420807/)A "Common World": Instead of humans adapting entirely to rigid machine code, or machines failing to comprehend human nuance, it constructs a mutually constructed context. This allows all three actors to coexist and co-adapt as peers in a shared ecosystem. [1] (https://www.sciencedirect.com/book/9780128205433/human-machine-shared-contexts), (https://www.sciencedirect.com/topics/computer-science/shared-context)
+> Real-World Parallel
+> Think of a fully automated, next-generation smart factory or airport.The Human provides the strategic intent (e.g., "Prioritize flight turnaround time safely").The Software (AI/Algorithms) dynamically optimizes routes, baggage handling schedules, and fueling queues based on real-time data streams.The Machines (Autonomous vehicles, robotic gates) execute the physical tasks safely alongside humans.Without a common operational frame of reference, these layers function as disconnected silos. With it, they become an integrated, high-performing orchestra.
+
 Consort is a minimal, symbol-based structured prompt
 language designed for clarity, density, and reduced ambiguity — distinct
 voices, each with a distinct role, combining into one coherent prompt. It is
