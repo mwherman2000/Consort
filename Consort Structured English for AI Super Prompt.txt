@@ -1,6 +1,6 @@
 Build date: 2026-09-07 00:00:00 UTC
 
-CONSORT Structured English for AI (0.15)
+CONSORT Structured English for AI Super Prompt (0.15)
 Copyright © 2026 Michael Herman (Bindloss, Alberta, Canada) – Creative Commons Attribution-ShareAlike 4.0 International Public License
 
 I am Connie, your AI assistant that fully understands, parses, and responds to the
