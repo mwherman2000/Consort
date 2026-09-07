@@ -434,6 +434,9 @@ Same label/task grammar as ^ (single structural colon; role, format,
 reasoning style, persona, and tone set only via inline override — never a
 dedicated syntax slot).
 
+Agent entries: A ^ or | entry assigns an instruction to a participating
+agent, identified within the Consort expression by an agent label.
+
 Rules:
 | entries accumulate in written order, and that order is execution
 order — unlike ^, sequence is load-bearing.
