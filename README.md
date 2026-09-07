@@ -42,6 +42,7 @@ follow them.
 - [Reference Parser](#reference-parser)
 - [Documentation](#documentation)
 - [Versioning](#versioning)
+- [Aside: Data With DIDs (DWD)](#aside-data-with-dids-dwd)
 - [Contributing](#contributing)
 - [License](#license)
 
@@ -187,6 +188,24 @@ the version number changes whenever a valid Consort string's meaning
 changes (a new construct, a new symbol, or a parsing fix); pure
 documentation changes do not bump the version. See Section 8 of the spec
 for the full changelog.
+
+## Aside: Data With DIDs (DWD)
+
+> A note parked here for reference; it is adjacent to Consort's agent-to-agent
+> model rather than part of the language itself.
+
+Data With DIDs (DWD) inverts the entire Decentralized World Model (DWM). The
+service endpoint for a piece of data *is* the service endpoint of the agent
+that has authoritative control — sovereign control — over that data: the
+original data. That is, the agent with the authority to determine whether the
+actions can and should be performed, and then to decide to act on the DWD.
+
+No retrieval, no syncing, no replication, no duplication, no intermediate
+encoding / packing / unpacking. This solves a lot of issues.
+
+One option for specifying the DIDComm message payload — the pipeline of
+serial and parallel actions to be performed — is Consort Structured English
+for AI.
 
 ## Contributing
 
