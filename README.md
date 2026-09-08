@@ -1,4 +1,4 @@
-# CONSORT Markdown for Coordinated Intelligence
+# CONSORT is Markdown for Coordinated Intelligence
 Copyright © 2026 Michael Herman (Bindloss, Alberta, Canada) – Creative Commons Attribution-ShareAlike 4.0 International Public License
 
 <img width="1536" height="1024" alt="Consort Logo 0 12" src="https://github.com/user-attachments/assets/5e793046-f74c-4aba-bd0e-a575def34e26" style="max-width: 100%; height: auto;" />
