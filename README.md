@@ -1,4 +1,5 @@
-# CONSORT is Markdown for Coordinated Intelligence
+# CONSORT - Markdown for Intelligent Coordination
+Consort Markdown for Intelligent Coordination Super Prompt (previously known as Consort Structured English for AI Super Prompt DSL)
 Copyright © 2026 Michael Herman (Bindloss, Alberta, Canada) – Creative Commons Attribution-ShareAlike 4.0 International Public License
 
 <img width="1536" height="1024" alt="Consort Logo 0 12" src="https://github.com/user-attachments/assets/5e793046-f74c-4aba-bd0e-a575def34e26" style="max-width: 100%; height: auto;" />
@@ -11,7 +12,7 @@ Copyright © 2026 Michael Herman (Bindloss, Alberta, Canada) – Creative Common
 > Real-World Parallel
 > Think of a fully automated, next-generation smart factory or airport.The Human provides the strategic intent (e.g., "Prioritize flight turnaround time safely").The Software (AI/Algorithms) dynamically optimizes routes, baggage handling schedules, and fueling queues based on real-time data streams.The Machines (Autonomous vehicles, robotic gates) execute the physical tasks safely alongside humans.Without a common operational frame of reference, these layers function as disconnected silos. With it, they become an integrated, high-performing orchestra.
 
-## Consort is Markdown for Coordinated Intelligence
+## Consort is Markdown for Intelligent Coordination
 
 Consort is a minimal, symbol-based structured prompt
 language designed for clarity, density, and reduced ambiguity — distinct

@@ -1,4 +1,4 @@
-"""PEG-based reference parser for the Consort Prompt DSL (spec v0.12).
+"""PEG-based reference parser for the Consort Prompt DSL (spec v0.16).
 
 Drives parser/peg/consort.peg (loaded via parsimonious) to do the actual
 tokenizing/parsing work that parser/consort_parser.py does with hand-rolled
@@ -49,7 +49,10 @@ from ..consort_parser import (
     ACCUMULATING_OVERRIDE_SYMBOLS,
     ACCUMULATING_TOP_SYMBOLS,
     LABEL_RE,
+    LABELED_FORM_SYMBOLS,
+    BareColonInvalidError,
     ConsortError,
+    DuplicateDirectiveLabelError,
     Entry,
     LabelReference,
     ParsedMessage,
@@ -150,11 +153,59 @@ class _ForEachHeaderVisitor(NodeVisitor):
 
 
 def _split_label_and_task(rest: str) -> Tuple[str, str]:
+    if rest.startswith(":"):
+        # Section 3's global rule: a bare "kind:" / "kind :" (rest is
+        # already whitespace-stripped by the caller, so both collapse to
+        # this) is invalid -- not a valid entry with an implicit/empty
+        # agent-label. Checked before the grammar parse below: entry_body's
+        # `label` rule requires one or more characters, so an empty label
+        # would otherwise just fail to parse at all and surface as the
+        # generic "no structural ':'" error instead of this specific one.
+        raise BareColonInvalidError(
+            f"a bare entry-opening colon with no <agent-label> before it is invalid: {rest!r}"
+        )
     try:
         tree = GRAMMAR["entry_body"].parse(rest)
     except (ParseError, IncompleteParseError) as exc:
         raise ConsortError(f"entry has no structural ':' separating label from task: {rest!r}") from exc
     return _EntryBodyVisitor().visit(tree)
+
+
+class _LabeledDirectiveVisitor(NodeVisitor):
+    def generic_visit(self, node, children):
+        return _unwrap(children) if children else node.text
+
+    def visit_labeled_directive_value(self, node, children):
+        # labeled_directive_value = label_chars ws0 ":" ws0 task_rest
+        return (children[0].strip(), children[4])
+
+
+def _has_bare_colon_prefix(text: str) -> bool:
+    """Section 3's global rule: does `text` start with only whitespace then
+    a colon (no digits, no label characters) -- e.g. "#:" or "# :"?
+
+    Uses .match() (a prefix match, not requiring the whole string to be
+    consumed) since bare_colon_prefix only needs to recognize the start
+    of `text`.
+    """
+    try:
+        GRAMMAR["bare_colon_prefix"].match(text)
+        return True
+    except ParseError:
+        return False
+
+
+def _split_labeled_directive_value(text: str) -> Optional[Tuple[str, str]]:
+    """Section 2.5's optional labeled form for #/$/*: try to split `text`
+    into (label, content). Returns None -- not an error -- if `text`
+    doesn't match (no colon, or the text before the first colon isn't a
+    clean label), so the caller falls back to plain, unlabeled content.
+    """
+    try:
+        tree = GRAMMAR["labeled_directive_value"].parse(text)
+    except (ParseError, IncompleteParseError):
+        return None
+    return _LabeledDirectiveVisitor().visit(tree)
 
 
 # --------------------------------------------------------------------------
@@ -275,10 +326,34 @@ def _open_entry_segment_framed(kind: str, payload: str, indent: int,
     label, sep, task = payload.partition(":")
     if not sep:
         raise ConsortError(f"framed entry has no structural ':' separating label from task: {payload!r}")
+    if not label.strip():
+        raise BareColonInvalidError(
+            f"a bare {kind}: (or {kind} :) with no <agent-label> before the colon is "
+            f"invalid -- <agent-label> must be non-empty"
+        )
     return {
         "type": "entry", "kind": kind, "indent": indent, "label": label.strip(),
         "task_buf": task.strip(), "nested_under": nested_under, "group": group, "framed": True,
     }
+
+
+def _open_directive_segment(sym: str, rest: str) -> dict:
+    """Open a #/$/*/!/%/@ directive segment from its first (already
+    symbol-stripped, whitespace-stripped) line: Section 3's global
+    bare-colon rule, then -- for #/$/* only -- Section 2.5's optional
+    labeled form, falling back to plain content on any non-match.
+    """
+    if _has_bare_colon_prefix(rest):
+        raise BareColonInvalidError(
+            f"a bare {sym}: (or {sym} :) with no digits (framed form, 2.10) and no "
+            f"label characters (labeled form, 2.5) before the colon is invalid"
+        )
+    if sym in LABELED_FORM_SYMBOLS:
+        split = _split_labeled_directive_value(rest)
+        if split is not None:
+            label, value = split
+            return {"type": "directive", "symbol": sym, "text": value, "label": label, "framed": False}
+    return {"type": "directive", "symbol": sym, "text": rest, "label": None, "framed": False}
 
 
 def _segment_records(records: List[_Rec]) -> List[dict]:
@@ -313,7 +388,10 @@ def _segment_records(records: List[_Rec]) -> List[dict]:
                 if rec.indent == 0:
                     enclosing_pipe_label = seg["label"] if sym == "|" else None
             else:
-                segments.append({"type": "directive", "symbol": sym, "text": rec.payload, "framed": True})
+                # Framed payloads are opaque (2.10) even for #/$/*: never
+                # scanned for the labeled form, which is why this branch
+                # bypasses _open_directive_segment.
+                segments.append({"type": "directive", "symbol": sym, "text": rec.payload, "label": None, "framed": True})
                 if rec.indent == 0:
                     enclosing_pipe_label = None
             continue
@@ -336,7 +414,7 @@ def _segment_records(records: List[_Rec]) -> List[dict]:
                     current = _open_entry_segment(sym, rest, 0, None, group)
                     enclosing_pipe_label = current["label"] if sym == "|" else None
                 else:
-                    current = {"type": "directive", "symbol": sym, "text": rest, "framed": False}
+                    current = _open_directive_segment(sym, rest)
                     enclosing_pipe_label = None
             elif sym == "^" and enclosing_pipe_label is not None:
                 close_current()
@@ -400,14 +478,29 @@ def _finalize_entry_segment(seg: dict, order: int) -> Entry:
 
 
 def _finalize_segments(segments: List[dict]) -> Tuple[Dict[str, object], List[Entry]]:
-    directives: Dict[str, object] = {"!": None, "#": [], "$": [], "%": None, "*": None, "@": None}
+    directives: Dict[str, object] = {
+        "!": None, "#": [], "$": [], "%": None, "*": None, "@": None,
+        # Section 2.5 [NEW in v0.16]: label -> content, kept separate from
+        # the plain accumulating/scalar values above -- a labeled instance
+        # never folds into (or becomes) the unlabeled set, even when it is
+        # the only instance of that symbol present (2.5).
+        "#_labeled": {}, "$_labeled": {}, "*_labeled": {},
+    }
     entries: List[Entry] = []
     order = 0
 
     for seg in segments:
         if seg["type"] == "directive":
-            sym, value = seg["symbol"], seg["text"].strip()
-            if sym in ACCUMULATING_TOP_SYMBOLS:
+            sym, value, label = seg["symbol"], seg["text"].strip(), seg.get("label")
+            if label is not None:
+                labeled = directives[f"{sym}_labeled"]
+                if label in labeled:
+                    raise DuplicateDirectiveLabelError(
+                        f"label {label!r} is used by more than one {sym} directive; "
+                        f"labels must be unique among instances of the same symbol (2.5)"
+                    )
+                labeled[label] = value
+            elif sym in ACCUMULATING_TOP_SYMBOLS:
                 directives[sym].append(value)
             else:
                 directives[sym] = value

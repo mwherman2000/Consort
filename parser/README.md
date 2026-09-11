@@ -1,11 +1,16 @@
 # Consort Reference Parser
 
 A Python reference implementation of the Consort DSL's parseable structure
-(spec v0.12), covering:
+(spec v0.16), covering:
 
 - **Top-level directives** `! # $ % * @` — including multi-line loose-form
   scanning (a directive's value continues across lines until a blank line
-  or the next directive) and `#`/`$` accumulation.
+  or the next directive), `#`/`$` accumulation, and (v0.16, 2.5) `#`/`$`/`*`'s
+  optional LABELED FORM (`<label>: <content>`), kept in a separate
+  `{symbol}_labeled` dict rather than folded into the plain accumulating set.
+- **The global bare-colon rule** (v0.16, Section 3) — `<symbol>:` or
+  `<symbol> :` with no digits and no label text in between is invalid for
+  all eight symbols, not only #/$/*.
 - **`^`/`|` entries** — label:task parsing, one level of nested `^` under
   `|` (2.9), and inline overrides `/$ /% /@ /*` with the spec's
   accumulate-vs-replace rule and wrapped-continuation-line values.
@@ -75,10 +80,11 @@ msg.warnings                 # -> e.g. a for-each template missing %item-var%
 ```
 
 `parse()` raises `UndefinedLabelError`, `ForwardReferenceError`,
-`SiblingFanoutReferenceError`, `DuplicateLabelError`, `MissingIntentError`,
-`MixedTopLevelDelegationError`, or `MalformedFramedFormError` (all
-subclasses of `ConsortError`) on the first structural problem found, in
-document order.
+`SiblingFanoutReferenceError`, `DuplicateLabelError`,
+`DuplicateDirectiveLabelError`, `BareColonInvalidError`,
+`MissingIntentError`, `MixedTopLevelDelegationError`, or
+`MalformedFramedFormError` (all subclasses of `ConsortError`) on the first
+structural problem found, in document order.
 
 ## Running the tests
 

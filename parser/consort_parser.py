@@ -1,10 +1,11 @@
-"""Reference parser for the Consort Prompt DSL (spec v0.12).
+"""Reference parser for the Consort Prompt DSL (spec v0.16).
 
 This is a reference implementation of Consort's *parseable* structure: the
 eight top-level directives, ^/| entries (including nested ^ under | and
 for-each generators), inline overrides, framed-form length-prefixed
-payloads, and { } label references (Section 2.11) -- with the validation
-rules the spec attaches to each construct.
+payloads, { } label references (Section 2.11), and the v0.16 LABELED FORM
+for #/$/* plus the global bare-colon rule (Section 2.5/3) -- with the
+validation rules the spec attaches to each construct.
 
 Deliberately out of scope, because they are runtime/response-behavior rules
 for the *interpreting model*, not structural parsing rules a parser can
@@ -31,8 +32,27 @@ ACCUMULATING_TOP_SYMBOLS = {"#", "$"}
 OVERRIDE_SYMBOLS = {"$", "%", "@", "*"}
 ACCUMULATING_OVERRIDE_SYMBOLS = {"$"}
 
+# Section 2.5 [NEW in v0.16]: #, $, and * each additionally accept an
+# optional LABELED FORM ("<label>: <content>") alongside their existing
+# plain (accumulating, for # / $) or scalar (*) form. !, %, @, ^, and |
+# are unaffected -- ^/| already have a *mandatory* label:task grammar
+# (below), and !/%/@ have no labeled form at all.
+LABELED_FORM_SYMBOLS = {"#", "$", "*"}
+
 LABEL_CHARS = r"[A-Za-z0-9_-]+"
 LABEL_RE = re.compile(rf"^{LABEL_CHARS}$")
+
+# #/$/*'s optional labeled form: label chars (no internal whitespace),
+# optional whitespace, a structural colon, optional whitespace, then the
+# rest of the (possibly multi-line-accumulated) content. Python's regex
+# engine backtracks the label_chars run on failure, so prose that merely
+# *contains* a colon later on (e.g. "Meeting notes: agenda") never
+# falsely matches here -- it simply falls through to plain form, exactly
+# as for-each's %item-var% falls through to plain text on a non-match
+# (2.8) and label references fall through to plain text on non-matching
+# braces (2.11). re.DOTALL so a labeled directive's content may itself
+# span multiple already-joined continuation lines.
+_LABELED_VALUE_RE = re.compile(rf"^({LABEL_CHARS})\s*:\s*(.*)$", re.DOTALL)
 
 # Either an escaped opening brace (\{, always literal) or a candidate label
 # reference token: {label} or {label}.field, no internal whitespace.
@@ -69,6 +89,20 @@ class SiblingFanoutReferenceError(ConsortError):
 
 class DuplicateLabelError(ConsortError):
     """Section 2.8: <agent-label> must be unique across the entire message."""
+
+
+class DuplicateDirectiveLabelError(ConsortError):
+    """Section 2.5: two labeled instances of the same #/$/* symbol share a label.
+
+    Scoped per-symbol (2.5), unlike DuplicateLabelError's message-wide
+    ^/| namespace -- a # label and a $ label may reuse the same text.
+    """
+
+
+class BareColonInvalidError(ConsortError):
+    """Section 3's global rule: <symbol>: or <symbol> : with no digits and
+    no label/identifier text in between is invalid for every symbol,
+    including !, %, and @, which have no labeled form to fall back to."""
 
 
 class MissingIntentError(ConsortError):
@@ -260,6 +294,14 @@ def _open_entry_segment(kind: str, rest: str, indent: int, nested_under: Optiona
     label_part, sep, task_start = rest.partition(":")
     if not sep:
         raise ConsortError(f"entry has no structural ':' separating label from task: {rest!r}")
+    if not label_part.strip():
+        # Section 3's global rule: a bare "kind:" / "kind :" with nothing
+        # (no label characters) before the structural colon is invalid --
+        # not a valid entry with an implicit/empty agent-label.
+        raise BareColonInvalidError(
+            f"a bare {kind}: (or {kind} :) with no <agent-label> before the colon is "
+            f"invalid -- <agent-label> must be non-empty"
+        )
     return {
         "type": "entry",
         "kind": kind,
@@ -270,6 +312,28 @@ def _open_entry_segment(kind: str, rest: str, indent: int, nested_under: Optiona
         "group": group,
         "framed": framed,
     }
+
+
+def _open_directive_segment(sym: str, rest: str) -> dict:
+    """Open a #/$/*/!/%/@ directive segment from its first (already
+    symbol-stripped) line, applying Section 3's global bare-colon rule and
+    -- for #/$/* only -- Section 2.5's optional labeled form.
+
+    `rest` has already been fully stripped of leading/trailing whitespace
+    by the caller, so both "sym:" and "sym :" collapse to `rest` starting
+    with ":" here -- a single check catches the adjacent and
+    whitespace-separated bare-colon cases alike.
+    """
+    if rest.startswith(":"):
+        raise BareColonInvalidError(
+            f"a bare {sym}: (or {sym} :) with no digits (framed form, 2.10) and no "
+            f"label characters (labeled form, 2.5) before the colon is invalid"
+        )
+    if sym in LABELED_FORM_SYMBOLS:
+        m = _LABELED_VALUE_RE.match(rest)
+        if m:
+            return {"type": "directive", "symbol": sym, "text": m.group(2), "label": m.group(1), "framed": False}
+    return {"type": "directive", "symbol": sym, "text": rest, "label": None, "framed": False}
 
 
 def _segment_lines(logical_lines: List[_LogicalLine]) -> List[dict]:
@@ -302,7 +366,10 @@ def _segment_lines(logical_lines: List[_LogicalLine]) -> List[dict]:
                 if ll.indent == 0:
                     enclosing_pipe_label = seg["label_part"] if sym == "|" else None
             else:
-                segments.append({"type": "directive", "symbol": sym, "text": ll.content, "framed": True})
+                # Framed payloads are opaque (2.10) even for #/$/*: never
+                # scanned for the labeled form, which is why this branch
+                # does not go through _open_directive_segment.
+                segments.append({"type": "directive", "symbol": sym, "text": ll.content, "label": None, "framed": True})
                 if ll.indent == 0:
                     enclosing_pipe_label = None
             continue
@@ -330,7 +397,7 @@ def _segment_lines(logical_lines: List[_LogicalLine]) -> List[dict]:
                     current = _open_entry_segment(sym, rest, 0, None, group, framed=False)
                     enclosing_pipe_label = current["label_part"] if sym == "|" else None
                 else:
-                    current = {"type": "directive", "symbol": sym, "text": rest, "framed": False}
+                    current = _open_directive_segment(sym, rest)
                     enclosing_pipe_label = None
                 continue
             else:
@@ -432,14 +499,29 @@ def _parse_entries(text: str) -> Tuple[Dict[str, object], List[Entry]]:
     logical_lines = _scan_logical_lines(text)
     segments = _segment_lines(logical_lines)
 
-    directives: Dict[str, object] = {"!": None, "#": [], "$": [], "%": None, "*": None, "@": None}
+    directives: Dict[str, object] = {
+        "!": None, "#": [], "$": [], "%": None, "*": None, "@": None,
+        # Section 2.5 [NEW in v0.16]: label -> content, kept separate from
+        # the plain accumulating/scalar values above -- a labeled instance
+        # never folds into (or becomes) the unlabeled set, even when it is
+        # the only instance of that symbol present (2.5).
+        "#_labeled": {}, "$_labeled": {}, "*_labeled": {},
+    }
     entries: List[Entry] = []
     order = 0
 
     for seg in segments:
         if seg["type"] == "directive":
-            sym, value = seg["symbol"], seg["text"].strip()
-            if sym in ACCUMULATING_TOP_SYMBOLS:
+            sym, value, label = seg["symbol"], seg["text"].strip(), seg.get("label")
+            if label is not None:
+                labeled = directives[f"{sym}_labeled"]
+                if label in labeled:
+                    raise DuplicateDirectiveLabelError(
+                        f"label {label!r} is used by more than one {sym} directive; "
+                        f"labels must be unique among instances of the same symbol (2.5)"
+                    )
+                labeled[label] = value
+            elif sym in ACCUMULATING_TOP_SYMBOLS:
                 directives[sym].append(value)
             else:
                 directives[sym] = value

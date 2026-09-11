@@ -1,5 +1,5 @@
 # ============================================================================
-# consort.peg -- PEG grammar for the Consort Prompt DSL (spec v0.12)
+# consort.peg -- PEG grammar for the Consort Prompt DSL (spec v0.16)
 # ============================================================================
 #
 # Written in Parsimonious's PEG dialect (https://github.com/erikrose/parsimonious):
@@ -67,7 +67,33 @@ rest                = ~"[^\n]*"
 
 entry_body          = label ":" ws0 task_rest
 label               = ~"[^:\n]+"
-task_rest           = ~"[\s\S]*"
+task_rest           = ~"[\\s\\S]*"
+
+# ---- Layer 2a′: #/$/*'s OPTIONAL labeled form (Section 2.5) [NEW in v0.16]
+#
+# Unlike entry_body above, this is optional and deliberately strict: the
+# label must be pure identifier characters (label_chars, no internal
+# whitespace or punctuation) immediately up to the colon (whitespace
+# before the colon tolerated, per Section 3's "forgiving of minor
+# formatting" rule). If the text up to the first colon isn't a clean
+# label, or there's no colon at all, labeled_directive_value simply fails
+# to match -- peg_parser.py catches that and falls back to plain,
+# unlabeled content (2.5's backward-compatible design), the same
+# non-matching-falls-through-to-plain-text pattern as %item-var% (2.8)
+# and { } label references (2.11).
+
+labeled_directive_value = label_chars ws0 ":" ws0 task_rest
+
+# ---- Layer 2a″: the GLOBAL bare-colon rule (Section 3) [NEW in v0.16] ----
+#
+# A colon preceded only by whitespace (i.e. no label characters, no
+# digits -- framed form's digits are already resolved upstream by the
+# byte-exact preprocessing pass before this grammar ever runs) is invalid
+# for every one of the eight symbols, not just #/$/*. peg_parser.py
+# checks this BEFORE trying labeled_directive_value or falling back to
+# plain content, for !/%/@ (no labeled form at all) as well as #/$/*.
+
+bare_colon_prefix   = ws0 ":"
 
 # ---- Layer 2b: for-each's header (Section 2.8) ----------------------------
 

@@ -119,7 +119,10 @@ def test_escaping_the_symbol_prevents_the_split(parse):
 def test_no_symbols_at_all_is_ordinary_text(parse):
     msg = parse("just an ordinary English request with no Consort symbols at all\n")
     assert msg.entries == []
-    assert msg.directives == {"!": None, "#": [], "$": [], "%": None, "*": None, "@": None}
+    assert msg.directives == {
+        "!": None, "#": [], "$": [], "%": None, "*": None, "@": None,
+        "#_labeled": {}, "$_labeled": {}, "*_labeled": {},
+    }
     assert msg.references == {}
     assert msg.warnings == []
 
