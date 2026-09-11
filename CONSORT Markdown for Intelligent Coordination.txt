@@ -173,9 +173,9 @@ intent. The same advisory-only caveat applies to ^‘s concurrency
 signal, |‘s sequencing signal, and { }‘s addressing guarantee —
 see 2.8/2.9/2.11.
 Top-level $/# constraints are inherited by every ^/| entry unless
-overridden inline (2.8) — this applies equally to plain and labeled
-instances (2.5); a label identifies a block for the reader, it does not
-scope which entries receive it. See 2.5 for the full rule.
+overridden inline (2.8) — this applies to plain instances only. A
+labeled instance (2.5) requires an entry’s task text to name its label
+before that entry receives it; see 2.5 for the full rule.
 $ may appear more than once, either in plain accumulating form or in
 labeled, individually-identified form — see 2.5.
 
@@ -263,23 +263,30 @@ characters before the colon, adjacent or whitespace-separated) does
 not satisfy this labeled form — it is invalid under Section 3’s
 global bare-colon rule, which applies to all nine symbols, not only
 these three. See Section 3 and Section 5.
-Inheritance is unaffected by labeling: a labeled #/$/* instance is
-inherited by every ^/| entry exactly like a plain instance (2.3) —
-labeling is for identification only (naming a block so multiple
-instances of the same symbol stay distinguishable), never for scoping
-which entries receive it. An entry’s task text does not need to name a
-label for that label’s content to be part of the entry’s working
-input, and naming one has no structural effect — it is ordinary prose,
-resolved (if at all) on the same best-effort basis as any other prose
-reference (2.11’s “Relationship to prose references”), not a
-requirement for access. There is no mechanism in this spec for scoping
-a labeled #/$/* block to a subset of entries; { } LABEL REFERENCES
-(2.11) do not apply here regardless (see above), and no alternative
-reference mechanism exists. An author who wants an entry to visibly
-receive only part of the inherited context should say so in that
-entry’s task description as ordinary guidance to the model, the same
-way any other task-scoping instruction is written — this is advisory
-content shaping, not a structural restriction the parser enforces.
+Inheritance requires explicit reference: unlike plain form (2.3/2.8),
+a labeled #/$/* instance is NOT automatically inherited by every ^/|
+entry. An entry receives a labeled block’s content only when its task
+description names that label — by prose, the same convention | stage
+non-adjacent references used before { } LABEL REFERENCES existed
+(2.9’s original mechanism). This is deliberately NOT a { } LABEL
+REFERENCE: labeled #/$/* instances remain outside that namespace
+(2.11, unchanged by this rule) — the reference here is ordinary prose,
+resolved by the interpreting model on the same best-effort basis as
+any other prose reference, not a parse-time-validated token. An entry
+whose task text names none of a message’s labeled blocks receives none
+of their content; an entry that names a label receives that block
+specifically, not the others. This gives labels real scoping weight —
+an author can keep a large labeled context block out of an entry’s
+working input simply by not naming it — at the cost of being advisory
+rather than mechanically checked: a misspelled or near-miss mention
+(2.5’s quality principle) is not flagged as an error the way an
+undefined { } reference would be (2.11), since prose isn’t validated.
+Plain #/$/* instances are entirely unaffected and continue to
+auto-inherit to every entry regardless of what any entry’s task text
+says (2.3/2.8). This restriction applies only to what a ^/| entry’s
+own working input includes; it has no bearing on a message with no
+^/| entries at all, where the interpreting model directly executing !
+sees every top-level directive, labeled or not, exactly as before.
 
 2.6 * THINK / REASONING STYLE DIRECTIVE
 
@@ -463,9 +470,9 @@ Additional rules:
 ^ entries accumulate (like # and $) — each new ^ line adds
 another sub-task; it does not replace prior ones.
 All entries inherit the enclosing #, $, %, *, @, and +
-directives unless overridden inline — for #/$/*, this applies equally
-to plain and labeled instances (2.5); labeling never scopes which
-entries receive a block.
+directives unless overridden inline — for #/$/*, this applies only to
+plain instances (2.5). A labeled #/$/* instance is inherited only by
+entries whose task text names its label; see 2.5 for the full rule.
 Presence of ^ changes the top-level ! from “the task to perform” to
 “the task to orchestrate” — the interpreting model’s own job becomes
 dispatch + merge, not execution.
@@ -564,9 +571,10 @@ Rules:
 | entries accumulate in written order, and that order is execution
 order — unlike ^, sequence is load-bearing.
 Implicit input handoff: stage n automatically receives stage
-n-1‘s full output as working input, plus top-level # context
-(inherited by all stages, plain and labeled alike — 2.5). Non-adjacent
-references (stage 3 needing
+n-1‘s full output as working input, plus top-level # context — plain
+instances only; a labeled # block reaches a stage only when that
+stage’s task text names its label (2.5). Non-adjacent references
+(stage 3 needing
 stage 1’s output, not just stage 2’s) must be named explicitly by
 agent-label in the task description — no implicit threading beyond one
 stage back. “Named explicitly” means either prose naming the label or a
@@ -1086,11 +1094,18 @@ same label → invalid per 2.5’s label-uniqueness rule; ask for
 clarification rather than guessing which block a later mention refers
 to.
 A ^/| entry’s task text does not mention a labeled #/$/* block’s
-label → not relevant to inheritance; the entry still receives that
-block’s content, exactly as it would a plain instance (2.3/2.5/2.8).
-Labels identify a block for the reader; they do not gate which entries
-receive it, and there is no mechanism in this spec for scoping a
-labeled block to a subset of entries.
+label → the entry does not receive that block’s content (2.5); unlike
+plain form, labeled #/$/* instances are not automatically inherited.
+This is not an error — it is the labeled form’s intended scoping
+effect — but flag it if the entry’s task otherwise implies it needs
+that content, since the omission may be accidental.
+An entry’s task text names a labeled #/$/* block’s label but the
+label doesn’t exist anywhere in the message (a typo, or a label that
+was renamed or removed) → not parse-time checkable, since this is
+prose, not a { } reference (2.11 continues to exclude #/$/* labels
+from that namespace, 2.5); apply best-effort judgment and flag the
+likely mismatch rather than silently treating the entry as having, or
+lacking, that content.
 Any directive symbol is followed by a colon with no digits and no
 label/identifier text in between, whether adjacent or separated only
 by whitespace (#:, $:, *:, !:, %:, @:, ^:, |:, +:, or any
@@ -1307,32 +1322,33 @@ drafter‘s output. The instruction to keep it “verbatim” is, like every
 other Consort instruction, advisory (2.3) — the label reference
 guarantees which content is meant, not that finalizer will comply.
 
-EXAMPLE H — Labeled context blocks alongside ^ entries, demonstrating inheritance
+EXAMPLE H — Labeled context blocks alongside ^ entries, demonstrating scoped inheritance
 
 Input:
 
-! extract biographical facts about each named individual from the sources
+! extract biographical facts about the named individuals from the sources
 # sources: three archived news articles and one court filing
 # named-individuals: Alice Chen, Bob Okafor, Carol Reyes
 $ cite the specific source for every fact
-^ alice-extractor: extract Alice Chen's biographical facts
-^ bob-extractor: extract facts about named individuals other than Alice
-^ carol-extractor: extract Carol Reyes's facts, cross-checking against sources
-% one section per individual, each fact cited
+^ named-extractor: extract facts about the named-individuals, citing sources for each
+^ general-extractor: extract any other biographical facts noticed in passing
+% one section per person mentioned, each fact cited
 
-Interpretation: all three ^ entries inherit both labeled # blocks —
-sources and named-individuals — exactly as they would a single
-unlabeled # block (2.3/2.5/2.8); the labels exist purely so the two
-context blocks stay distinguishable, not to control which entries see
-them. bob-extractor‘s task text happens to say “named individuals” and
-carol-extractor‘s happens to say “sources”, but this is ordinary prose
-with no structural effect (2.5) — alice-extractor receives exactly the
-same named-individuals and sources content despite naming neither
-label explicitly. An author who wanted alice-extractor scoped away from
-the other two individuals’ assignments would need to say so in
-alice-extractor‘s own task text as advisory guidance (e.g. “only Alice
-Chen, not the other two”) — Consort has no mechanism for structurally
-restricting which entries receive a labeled #/$/* block.
+Interpretation: named-extractor‘s task text names both labels —
+named-individuals and sources — so it receives both blocks as working
+input (2.5): it knows the three people to look for and has the source
+material to cite them against. general-extractor‘s task text names
+neither label, so it receives neither block’s content — unlike plain
+#/$, which would auto-inherit to every entry regardless (2.3/2.8), a
+labeled block reaches only an entry whose task text names it.
+general-extractor must work from whatever it otherwise knows, with
+neither the source material nor the named-individuals list as working
+input; this is the labeled form’s intended scoping effect, not an
+oversight — the author used labels specifically to keep the bulk of
+the sources and the named-individuals list out of general-extractor‘s
+working input. The reference is ordinary prose (2.5), not a { } LABEL
+REFERENCE (2.11) — {sources} would not be a valid token here even
+though a # sources: block exists.
 
 No symbol in Examples A–H appears with the same content in another example,
 and none of the eight examples’ subject matter depends on the others.
