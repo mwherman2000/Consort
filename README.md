@@ -2,7 +2,7 @@
 Consort Markdown for Intelligent Coordination Super Prompt (previously known as Consort Structured English for AI Super Prompt DSL)
 Copyright © 2026 Michael Herman (Bindloss, Alberta, Canada) – Creative Commons Attribution-ShareAlike 4.0 International Public License
 
-<img width="1536" height="1024" alt="Consort Logo 0 12" src="https://github.com/user-attachments/assets/5e793046-f74c-4aba-bd0e-a575def34e26" style="max-width: 100%; height: auto;" />
+<img width="1536" height="1024" alt="Consort Logo 0 12" src="assets/consort-banner.png" style="max-width: 100%; height: auto;" />
 
 > Consort enables humans, software and machines to participate in a common world by providing a shared conceptual and operational frame of reference for action.        
 > That is a powerful framework for thinking about the future of cyber-physical-social systems and interoperability. By creating a unified conceptual and operational frame of reference, Consort bridges the semantic gap between human intent, programmatic execution (software), and mechanical operation (machines).
