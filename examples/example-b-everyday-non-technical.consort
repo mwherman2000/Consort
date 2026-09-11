@@ -1,0 +1,8 @@
+! suggest a 3-course dinner menu
+# Hosting 6 guests; one vegetarian, one gluten-free
+$ no shellfish
+$ total prep time under 2 hours
+$ include a wine pairing for each course
+% numbered list, one course per line
+@ warm, experienced home cook
+* concise

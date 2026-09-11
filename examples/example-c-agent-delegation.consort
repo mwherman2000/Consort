@@ -1,0 +1,10 @@
+! research three independent C# libraries and merge results
+# evaluating for a .NET solution; libraries are unrelated — no shared
+  state between the research tasks
+$ verify current NuGet version via search, not training data
+% short summary + one-line recommendation per library, under 300 words each
+^ polly-researcher: research Polly (resilience)
+^ fluentvalidation-researcher: research FluentValidation
+^ mediatr-researcher: research MediatR /$ flag any recent licensing
+  changes explicitly
+* concise

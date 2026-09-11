@@ -1,0 +1,7 @@
+! outline a book, then draft every chapter
+| categorize: derive an outline of chapter categories from the
+  source material
+| draft: write chapters from the outline
+  ^ for-each category in {categorize}.outline: draft this chapter
+    from %category%'s assigned posts
+% one section per chapter, in outline order

@@ -1,0 +1,9 @@
+! review and merge feedback on a pull request
+# small internal refactor; two independent review angles needed
+  before merging
+| review: gather feedback before merging
+  ^ style-reviewer: check formatting and naming conventions
+  ^ substance-reviewer: check logical correctness
+| merge: combine {style-reviewer} and {substance-reviewer} feedback
+  into one report, noting any disagreement between them
+% single consolidated review comment

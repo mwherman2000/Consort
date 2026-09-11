@@ -1,0 +1,7 @@
+! locate root cause of a failing test
+#31:
+Expected: 12.50, Actual: 12.495
+$ do not modify any files
+$ cite exact file and line number
+% plain text, under 100 words
+* step-by-step

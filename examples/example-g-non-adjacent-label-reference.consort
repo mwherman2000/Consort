@@ -1,0 +1,10 @@
+! draft, review, and finalize a design doc, preserving the approved
+  examples section verbatim
+# internal API design doc; examples section already reviewed once and
+  must not be reworded
+| drafter: write the initial draft, including a worked examples section
+| reviewer: review the draft for correctness and clarity
+| finalizer: rewrite {drafter}'s draft addressing {reviewer}'s
+  feedback, but keep {drafter}.examples verbatim since it was already
+  approved
+% final document only

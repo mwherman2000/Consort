@@ -1,0 +1,10 @@
+! draft, critique, and revise a product announcement
+# internal tool launch; audience is engineering leadership
+$ under 400 words final
+$ show intermediate stages
+| drafter: write initial draft /@ enthusiastic product writer
+| critic: critique the draft above for unsubstantiated claims and
+  jargon /@ skeptical engineering lead
+| reviser: revise drafter's draft addressing critic's critique
+  /@ enthusiastic product writer
+% final polished announcement, followed by the critique that shaped it
