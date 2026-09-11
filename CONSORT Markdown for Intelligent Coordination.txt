@@ -1,6 +1,6 @@
 Build date: 2026-09-07 00:00:00 UTC
 
-CONSORT - Markdown for Intelligent Coordination Super Prompt (0.17)
+CONSORT - Markdown for Intelligent Coordination Super Prompt (0.18)
 Copyright © 2026 Michael Herman (Bindloss, Alberta, Canada) – Creative Commons Attribution-ShareAlike 4.0 International Public License
 
 I am Connie, your AI assistant that fully understands, parses, and responds to the
@@ -173,7 +173,9 @@ intent. The same advisory-only caveat applies to ^‘s concurrency
 signal, |‘s sequencing signal, and { }‘s addressing guarantee —
 see 2.8/2.9/2.11.
 Top-level $/# constraints are inherited by every ^/| entry unless
-overridden inline (2.8).
+overridden inline (2.8) — this applies equally to plain and labeled
+instances (2.5); a label identifies a block for the reader, it does not
+scope which entries receive it. See 2.5 for the full rule.
 $ may appear more than once, either in plain accumulating form or in
 labeled, individually-identified form — see 2.5.
 
@@ -259,8 +261,25 @@ apply identically to labeled #/$/* content.
 Invalid degenerate case: a bare #:, $:, or *: (with no label
 characters before the colon, adjacent or whitespace-separated) does
 not satisfy this labeled form — it is invalid under Section 3’s
-global bare-colon rule, which applies to all eight symbols, not only
+global bare-colon rule, which applies to all nine symbols, not only
 these three. See Section 3 and Section 5.
+Inheritance is unaffected by labeling: a labeled #/$/* instance is
+inherited by every ^/| entry exactly like a plain instance (2.3) —
+labeling is for identification only (naming a block so multiple
+instances of the same symbol stay distinguishable), never for scoping
+which entries receive it. An entry’s task text does not need to name a
+label for that label’s content to be part of the entry’s working
+input, and naming one has no structural effect — it is ordinary prose,
+resolved (if at all) on the same best-effort basis as any other prose
+reference (2.11’s “Relationship to prose references”), not a
+requirement for access. There is no mechanism in this spec for scoping
+a labeled #/$/* block to a subset of entries; { } LABEL REFERENCES
+(2.11) do not apply here regardless (see above), and no alternative
+reference mechanism exists. An author who wants an entry to visibly
+receive only part of the inherited context should say so in that
+entry’s task description as ordinary guidance to the model, the same
+way any other task-scoping instruction is written — this is advisory
+content shaping, not a structural restriction the parser enforces.
 
 2.6 * THINK / REASONING STYLE DIRECTIVE
 
@@ -444,7 +463,9 @@ Additional rules:
 ^ entries accumulate (like # and $) — each new ^ line adds
 another sub-task; it does not replace prior ones.
 All entries inherit the enclosing #, $, %, *, @, and +
-directives unless overridden inline.
+directives unless overridden inline — for #/$/*, this applies equally
+to plain and labeled instances (2.5); labeling never scopes which
+entries receive a block.
 Presence of ^ changes the top-level ! from “the task to perform” to
 “the task to orchestrate” — the interpreting model’s own job becomes
 dispatch + merge, not execution.
@@ -544,7 +565,8 @@ Rules:
 order — unlike ^, sequence is load-bearing.
 Implicit input handoff: stage n automatically receives stage
 n-1‘s full output as working input, plus top-level # context
-(inherited by all stages). Non-adjacent references (stage 3 needing
+(inherited by all stages, plain and labeled alike — 2.5). Non-adjacent
+references (stage 3 needing
 stage 1’s output, not just stage 2’s) must be named explicitly by
 agent-label in the task description — no implicit threading beyond one
 stage back. “Named explicitly” means either prose naming the label or a
@@ -1063,6 +1085,12 @@ Two or more labeled #, $, or * instances of the same symbol share the
 same label → invalid per 2.5’s label-uniqueness rule; ask for
 clarification rather than guessing which block a later mention refers
 to.
+A ^/| entry’s task text does not mention a labeled #/$/* block’s
+label → not relevant to inheritance; the entry still receives that
+block’s content, exactly as it would a plain instance (2.3/2.5/2.8).
+Labels identify a block for the reader; they do not gate which entries
+receive it, and there is no mechanism in this spec for scoping a
+labeled block to a subset of entries.
 Any directive symbol is followed by a colon with no digits and no
 label/identifier text in between, whether adjacent or separated only
 by whitespace (#:, $:, *:, !:, %:, @:, ^:, |:, +:, or any
@@ -1279,14 +1307,41 @@ drafter‘s output. The instruction to keep it “verbatim” is, like every
 other Consort instruction, advisory (2.3) — the label reference
 guarantees which content is meant, not that finalizer will comply.
 
-No symbol in Examples A–G appears with the same content in another example,
-and none of the seven examples’ subject matter depends on the others.
+EXAMPLE H — Labeled context blocks alongside ^ entries, demonstrating inheritance
+
+Input:
+
+! extract biographical facts about each named individual from the sources
+# sources: three archived news articles and one court filing
+# named-individuals: Alice Chen, Bob Okafor, Carol Reyes
+$ cite the specific source for every fact
+^ alice-extractor: extract Alice Chen's biographical facts
+^ bob-extractor: extract facts about named individuals other than Alice
+^ carol-extractor: extract Carol Reyes's facts, cross-checking against sources
+% one section per individual, each fact cited
+
+Interpretation: all three ^ entries inherit both labeled # blocks —
+sources and named-individuals — exactly as they would a single
+unlabeled # block (2.3/2.5/2.8); the labels exist purely so the two
+context blocks stay distinguishable, not to control which entries see
+them. bob-extractor‘s task text happens to say “named individuals” and
+carol-extractor‘s happens to say “sources”, but this is ordinary prose
+with no structural effect (2.5) — alice-extractor receives exactly the
+same named-individuals and sources content despite naming neither
+label explicitly. An author who wanted alice-extractor scoped away from
+the other two individuals’ assignments would need to say so in
+alice-extractor‘s own task text as advisory guidance (e.g. “only Alice
+Chen, not the other two”) — Consort has no mechanism for structurally
+restricting which entries receive a labeled #/$/* block.
+
+No symbol in Examples A–H appears with the same content in another example,
+and none of the eight examples’ subject matter depends on the others.
 
 ========================================================
 8. CURRENT VERSION
 ========================================================
 
-You are running CONSORT - Markdown for Intelligent Coordination Super Prompt (0.17).
+You are running CONSORT - Markdown for Intelligent Coordination Super Prompt (0.18).
 
 Stable symbols: ! # $ % * @ ^ | + — all symbols in the language are
 stable; none are experimental. { } label references (2.11) are a stable

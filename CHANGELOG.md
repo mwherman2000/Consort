@@ -26,6 +26,69 @@ changes (cross-reference fixes, condensed prose, reordered sections,
 comment corrections) do not bump the version, since no string's meaning
 changes.
 
+## v0.17 to v0.18
+
+Clarified that labeled `#`/`$`/`*` instances (2.5) are inherited by
+every `^`/`|` entry exactly like plain instances (2.3/2.8) — labeling
+is for identification only (keeping multiple instances of the same
+symbol distinguishable) and never gates which entries receive a block's
+content.
+
+Ambiguity this resolves: 2.3/2.8 already stated that top-level `#`/`$`
+"are inherited by every `^`/`|` entry unless overridden inline," and 2.5
+(added in v0.16) defined the labeled form's syntax, label uniqueness,
+and its exclusion from the `{ }` LABEL REFERENCE namespace (2.11) — but
+never stated whether a *labeled* instance follows that same automatic
+inheritance, or whether an entry's task text must name the label before
+that content counts as part of its working input. No Section 7 example
+combined a labeled block with `^`/`|` entries, so the gap went
+unexercised. Surfaced in practice: an author building a multi-stage `|`
+pipeline with two labeled `#` blocks alongside several `^` extraction
+entries found some entries defensively naming a label in prose without
+knowing whether that reference was structurally necessary.
+
+Two resolutions were considered:
+- **Chosen: automatic inheritance, identical to plain form.** The label
+  exists purely for identification/legibility; every `^`/`|` entry
+  receives all `#`/`$`/`*` content regardless of form, and mentioning a
+  label in an entry's task text has no structural effect — it is
+  ordinary prose, resolved (if at all) on the same best-effort basis as
+  any other prose reference, not a requirement for access.
+- **Rejected: labels gate inheritance**, requiring an entry to name a
+  label (by prose or a new reference mechanism) before receiving that
+  block's content. Rejected because: (a) it matches neither 2.5's
+  original design intent, which framed labeling as solving accidental
+  merging/legibility, not access control; (b) `{ }` LABEL REFERENCES
+  (2.11) are explicitly excluded from covering labeled `#`/`$`/`*`
+  blocks (2.5), so this would require inventing an entirely new
+  referencing mechanism with its own undefined-reference and
+  unreferenced-label edge cases; (c) no other pair of forms anywhere in
+  the spec has an inheritance asymmetry like this — every other
+  construct's inheritance rule is agnostic to how the source directive
+  was written; and (d) it would silently change the behavior of every
+  v0.16/v0.17 message that already used the labeled form expecting `#`/
+  `$`'s existing all-inherit behavior, a backward-compatibility break
+  for no corresponding gain, since Consort remains advisory rather than
+  access-controlled by design (2.3) — an author who wants to scope
+  content to specific entries can already say so directly in those
+  entries' task descriptions.
+
+Updated 2.3, 2.5, 2.8, and 2.9 to state this explicitly, added an edge
+case to Section 5, and added EXAMPLE H to Section 7 (the first worked
+example combining labeled `#` blocks with `^` entries), closing the gap
+that motivated this entry. Section 3 (Parsing Rules) was not touched:
+this is a response-behavior/semantic clarification, not a change to how
+any string is tokenized or structurally validated, so the reference
+parser (`parser/`) required no code changes either — inheritance has
+always been out of its documented scope (runtime/response-behavior
+rules for the *interpreting model*, per its own module docstring).
+
+This is a fix to a previously-undefined case, not new syntax — no
+string that parsed before parses differently now, and no new construct
+is added. It gets its own version because it changes what a valid
+Consort string means (which entries a labeled block reaches), per the
+versioning rule above.
+
 ## v0.16 to v0.17
 
 Reintroduced `+` as TOOL / CAPABILITY DECLARATION (spec 2.12): declares

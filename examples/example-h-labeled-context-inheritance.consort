@@ -1,0 +1,8 @@
+! extract biographical facts about each named individual from the sources
+# sources: three archived news articles and one court filing
+# named-individuals: Alice Chen, Bob Okafor, Carol Reyes
+$ cite the specific source for every fact
+^ alice-extractor: extract Alice Chen's biographical facts
+^ bob-extractor: extract facts about named individuals other than Alice
+^ carol-extractor: extract Carol Reyes's facts, cross-checking against sources
+% one section per individual, each fact cited
