@@ -1,5 +1,5 @@
 # ============================================================================
-# consort.peg -- PEG grammar for the Consort Prompt DSL (spec v0.17)
+# consort.peg -- PEG grammar for the Consort Prompt DSL (spec v0.20)
 # ============================================================================
 #
 # Written in Parsimonious's PEG dialect (https://github.com/erikrose/parsimonious):

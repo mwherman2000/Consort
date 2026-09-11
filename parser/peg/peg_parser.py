@@ -1,4 +1,4 @@
-"""PEG-based reference parser for the Consort Prompt DSL (spec v0.17).
+"""PEG-based reference parser for the Consort Prompt DSL (spec v0.20).
 
 Drives parser/peg/consort.peg (loaded via parsimonious) to do the actual
 tokenizing/parsing work that parser/consort_parser.py does with hand-rolled

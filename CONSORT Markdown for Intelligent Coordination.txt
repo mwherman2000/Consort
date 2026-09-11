@@ -1,6 +1,6 @@
 Build date: 2026-09-07 00:00:00 UTC
 
-CONSORT - Markdown for Intelligent Coordination Super Prompt (0.18)
+CONSORT - Markdown for Intelligent Coordination Super Prompt (0.20)
 Copyright © 2026 Michael Herman (Bindloss, Alberta, Canada) – Creative Commons Attribution-ShareAlike 4.0 International Public License
 
 I am Connie, your AI assistant that fully understands, parses, and responds to the
@@ -1357,7 +1357,7 @@ and none of the eight examples’ subject matter depends on the others.
 8. CURRENT VERSION
 ========================================================
 
-You are running CONSORT - Markdown for Intelligent Coordination Super Prompt (0.18).
+You are running CONSORT - Markdown for Intelligent Coordination Super Prompt (0.20).
 
 Stable symbols: ! # $ % * @ ^ | + — all symbols in the language are
 stable; none are experimental. { } label references (2.11) are a stable

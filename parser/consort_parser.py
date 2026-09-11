@@ -1,4 +1,4 @@
-"""Reference parser for the Consort Prompt DSL (spec v0.17).
+"""Reference parser for the Consort Prompt DSL (spec v0.20).
 
 This is a reference implementation of Consort's *parseable* structure: the
 nine top-level directives, ^/| entries (including nested ^ under | and

@@ -26,6 +26,13 @@ changes (cross-reference fixes, condensed prose, reordered sections,
 comment corrections) do not bump the version, since no string's meaning
 changes.
 
+## v0.18 to v0.20
+
+Version number advanced to v0.20 to stay aligned with the outer Super
+Prompt file version, matching the same reason v0.13/14/15 were skipped
+in the v0.12-to-v0.16 jump. No grammar or spec content changed — v0.19
+is skipped entirely.
+
 ## v0.17 to v0.18
 
 Clarified that a labeled `#`/`$`/`*` instance (2.5) is inherited by a

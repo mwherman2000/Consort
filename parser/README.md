@@ -1,7 +1,7 @@
 # Consort Reference Parser
 
 A Python reference implementation of the Consort DSL's parseable structure
-(spec v0.17), covering:
+(spec v0.20), covering:
 
 - **Top-level directives** `! # $ % * @ +` — including multi-line loose-form
   scanning (a directive's value continues across lines until a blank line
