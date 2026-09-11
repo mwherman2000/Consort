@@ -1,5 +1,8 @@
 {
   "files.associations": {
     "*.consort": "yaml"
+  },
+  "[yaml]": {
+    "editor.wordWrap": "on"
   }
 }
