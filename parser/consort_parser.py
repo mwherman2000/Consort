@@ -1,11 +1,11 @@
-"""Reference parser for the Consort Prompt DSL (spec v0.16).
+"""Reference parser for the Consort Prompt DSL (spec v0.17).
 
 This is a reference implementation of Consort's *parseable* structure: the
-eight top-level directives, ^/| entries (including nested ^ under | and
-for-each generators), inline overrides, framed-form length-prefixed
-payloads, { } label references (Section 2.11), and the v0.16 LABELED FORM
-for #/$/* plus the global bare-colon rule (Section 2.5/3) -- with the
-validation rules the spec attaches to each construct.
+nine top-level directives, ^/| entries (including nested ^ under | and
+for-each generators), inline overrides (including /+, 2.12), framed-form
+length-prefixed payloads, { } label references (Section 2.11), and the
+LABELED FORM for #/$/* plus the global bare-colon rule (Section 2.5/3) --
+with the validation rules the spec attaches to each construct.
 
 Deliberately out of scope, because they are runtime/response-behavior rules
 for the *interpreting model*, not structural parsing rules a parser can
@@ -27,16 +27,20 @@ import re
 from dataclasses import dataclass, field
 from typing import Dict, List, Optional, Tuple
 
-TOP_SYMBOLS = "!#$%*@^|"
-ACCUMULATING_TOP_SYMBOLS = {"#", "$"}
-OVERRIDE_SYMBOLS = {"$", "%", "@", "*"}
-ACCUMULATING_OVERRIDE_SYMBOLS = {"$"}
+TOP_SYMBOLS = "!#$%*@^|+"
+# Section 2.12: + (tool/capability declaration) accumulates like # and $,
+# both at the top level and via its /+ override (2.8/2.12) -- unlike #/$,
+# though, it has no labeled form (LABELED_FORM_SYMBOLS below).
+ACCUMULATING_TOP_SYMBOLS = {"#", "$", "+"}
+OVERRIDE_SYMBOLS = {"$", "%", "@", "*", "+"}
+ACCUMULATING_OVERRIDE_SYMBOLS = {"$", "+"}
 
-# Section 2.5 [NEW in v0.16]: #, $, and * each additionally accept an
-# optional LABELED FORM ("<label>: <content>") alongside their existing
-# plain (accumulating, for # / $) or scalar (*) form. !, %, @, ^, and |
-# are unaffected -- ^/| already have a *mandatory* label:task grammar
-# (below), and !/%/@ have no labeled form at all.
+# Section 2.5: #, $, and * each additionally accept an optional LABELED
+# FORM ("<label>: <content>") alongside their existing plain (accumulating,
+# for # / $) or scalar (*) form. !, %, @, ^, |, and + are unaffected --
+# ^/| already have a *mandatory* label:task grammar (below), and !/%/@/+
+# have no labeled form at all (+ still accumulates like #/$ -- see
+# ACCUMULATING_TOP_SYMBOLS above -- it just has no <label>: prefix form).
 LABELED_FORM_SYMBOLS = {"#", "$", "*"}
 
 LABEL_CHARS = r"[A-Za-z0-9_-]+"
@@ -62,13 +66,13 @@ _TOKEN_RE = re.compile(r"\\\{" rf"|\{{({LABEL_CHARS})\}}(?:\.({LABEL_CHARS}))?")
 # consuming the entire source text.
 _SOURCE_RE = re.compile(rf"^\{{({LABEL_CHARS})\}}(?:\.({LABEL_CHARS}))?$")
 
-_OVERRIDE_SPLIT_RE = re.compile(r"(?:^|\s)/([$%@*])(?=\s|$)")
+_OVERRIDE_SPLIT_RE = re.compile(r"(?:^|\s)/([$%@*+])(?=\s|$)")
 _FOR_EACH_RE = re.compile(rf"^for-each\s+({LABEL_CHARS})\s+in\s+(.+)$")
 
 # Framed-form header: symbol, one or more digits, a colon -- no space
 # anywhere in the header. Matched against raw UTF-8 bytes so the declared
 # length is unambiguous (Section 2.10: "Length is measured in UTF-8 bytes").
-_FRAMED_HEADER_RE = re.compile(rb"([!#$%*@^|])([0-9]+):")
+_FRAMED_HEADER_RE = re.compile(rb"([!#$%*@^|+])([0-9]+):")
 
 
 class ConsortError(Exception):
@@ -500,11 +504,12 @@ def _parse_entries(text: str) -> Tuple[Dict[str, object], List[Entry]]:
     segments = _segment_lines(logical_lines)
 
     directives: Dict[str, object] = {
-        "!": None, "#": [], "$": [], "%": None, "*": None, "@": None,
-        # Section 2.5 [NEW in v0.16]: label -> content, kept separate from
-        # the plain accumulating/scalar values above -- a labeled instance
-        # never folds into (or becomes) the unlabeled set, even when it is
-        # the only instance of that symbol present (2.5).
+        "!": None, "#": [], "$": [], "%": None, "*": None, "@": None, "+": [],
+        # Section 2.5: label -> content, kept separate from the plain
+        # accumulating/scalar values above -- a labeled instance never
+        # folds into (or becomes) the unlabeled set, even when it is the
+        # only instance of that symbol present (2.5). + has no labeled
+        # form (LABELED_FORM_SYMBOLS), so it gets no "+_labeled" key.
         "#_labeled": {}, "$_labeled": {}, "*_labeled": {},
     }
     entries: List[Entry] = []

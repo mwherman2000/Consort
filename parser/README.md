@@ -1,19 +1,22 @@
 # Consort Reference Parser
 
 A Python reference implementation of the Consort DSL's parseable structure
-(spec v0.16), covering:
+(spec v0.17), covering:
 
-- **Top-level directives** `! # $ % * @` — including multi-line loose-form
+- **Top-level directives** `! # $ % * @ +` — including multi-line loose-form
   scanning (a directive's value continues across lines until a blank line
-  or the next directive), `#`/`$` accumulation, and (v0.16, 2.5) `#`/`$`/`*`'s
+  or the next directive), `#`/`$`/`+` accumulation, and (2.5) `#`/`$`/`*`'s
   optional LABELED FORM (`<label>: <content>`), kept in a separate
   `{symbol}_labeled` dict rather than folded into the plain accumulating set.
-- **The global bare-colon rule** (v0.16, Section 3) — `<symbol>:` or
+  `+` (2.12, TOOL / CAPABILITY DECLARATION) accumulates like `#`/`$` but has
+  no labeled form of its own.
+- **The global bare-colon rule** (Section 3) — `<symbol>:` or
   `<symbol> :` with no digits and no label text in between is invalid for
-  all eight symbols, not only #/$/*.
+  all nine symbols, not only #/$/*.
 - **`^`/`|` entries** — label:task parsing, one level of nested `^` under
-  `|` (2.9), and inline overrides `/$ /% /@ /*` with the spec's
-  accumulate-vs-replace rule and wrapped-continuation-line values.
+  `|` (2.9), and inline overrides `/$ /% /@ /* /+` with the spec's
+  accumulate-vs-replace rule (`/+` accumulates like `/$`) and
+  wrapped-continuation-line values.
 - **`for-each` generators** (2.8) — `{label}.field` source parsing and
   `%item-var%` interpolation, including `\%item-var%` escaping and the
   "template never references `%item-var%`" flag (a warning, not an error).

@@ -1,5 +1,5 @@
 # ============================================================================
-# consort.peg -- PEG grammar for the Consort Prompt DSL (spec v0.16)
+# consort.peg -- PEG grammar for the Consort Prompt DSL (spec v0.17)
 # ============================================================================
 #
 # Written in Parsimonious's PEG dialect (https://github.com/erikrose/parsimonious):
@@ -60,7 +60,7 @@ symbol_line         = indent top_symbol rest "\n"
 continuation_line   = !blank_line !symbol_line !escaped_line indent rest "\n"
 
 indent              = ~"[ ]*"
-top_symbol          = "!" / "#" / "$" / "%" / "*" / "@" / "^" / "|"
+top_symbol          = "!" / "#" / "$" / "%" / "*" / "@" / "^" / "|" / "+"
 rest                = ~"[^\n]*"
 
 # ---- Layer 2a: entry_body -- <agent-label> ":" <task> (Section 2.8) ------
@@ -84,14 +84,14 @@ task_rest           = ~"[\\s\\S]*"
 
 labeled_directive_value = label_chars ws0 ":" ws0 task_rest
 
-# ---- Layer 2a″: the GLOBAL bare-colon rule (Section 3) [NEW in v0.16] ----
+# ---- Layer 2a″: the GLOBAL bare-colon rule (Section 3) ------------------
 #
 # A colon preceded only by whitespace (i.e. no label characters, no
 # digits -- framed form's digits are already resolved upstream by the
 # byte-exact preprocessing pass before this grammar ever runs) is invalid
-# for every one of the eight symbols, not just #/$/*. peg_parser.py
+# for every one of the nine symbols, not just #/$/*. peg_parser.py
 # checks this BEFORE trying labeled_directive_value or falling back to
-# plain content, for !/%/@ (no labeled form at all) as well as #/$/*.
+# plain content, for !/%/@/+ (no labeled form at all) as well as #/$/*.
 
 bare_colon_prefix   = ws0 ":"
 
@@ -125,7 +125,7 @@ overrides           = override*
 base_run            = (!override_start any_char)*
 override            = override_start ws0 value_run
 override_start      = ws1 "/" override_symbol boundary
-override_symbol     = "$" / "%" / "@" / "*"
+override_symbol     = "$" / "%" / "@" / "*" / "+"
 value_run           = (!override_start any_char)*
 boundary            = ~"(?=[ \t]|$)"
 any_char            = ~"."

@@ -26,6 +26,64 @@ changes (cross-reference fixes, condensed prose, reordered sections,
 comment corrections) do not bump the version, since no string's meaning
 changes.
 
+## v0.16 to v0.17
+
+Reintroduced `+` as TOOL / CAPABILITY DECLARATION (spec 2.12): declares
+that a task — the top-level request as a whole, or, via inline `/+`
+(2.8/2.9), a single `^`/`|` entry — requires a specific tool or external
+capability to execute (e.g. live web search, file-system read access, a
+database connection). `+` was retired in v0.10 as a vague, undefined
+"Extras" catch-all with no defined semantics; v0.17 reuses the symbol for
+this unrelated, narrowly-scoped purpose — the v0.10 and v0.17 meanings
+share only the character, and a pre-v0.10 document's free-form `+` usage
+is not equivalent to, and will now be parsed as, a capability
+declaration.
+
+Motivating problem: there was previously no way to declare, at parse
+time, that a `^`/`|` entry needs a specific tool or external capability
+before it can execute. In practice this was being expressed by misusing
+`*`/`/*` (Think/Reasoning-style, spec 2.6) for values like `web-search`,
+which is not a defined reasoning style and is simply misinterpreted as
+an unrecognized custom-reasoning instruction rather than flagged.
+
+Grammar:
+- Top-level `+` accumulates (like `#`/`$`) and is inherited by every
+  `^`/`|` entry unless overridden inline — the same inheritance model as
+  `$`/`@`.
+- Inline `/+` uses the identical override grammar as `/$`/`/%`/`/@`/`/*`
+  (2.8/2.9) and accumulates (matching `/$`'s behavior, not `/%`/`/@`/`/*`'s
+  replace behavior).
+- `+` has no closed, enumerated vocabulary — capability names are
+  open-ended free text, the same design as `@` (persona) and `%`
+  (format), since which capabilities exist is a property of the
+  deployment/orchestrator, not of Consort itself.
+- Multiple capabilities for one entry are written as repeated `/+`
+  overrides (`/+ web-search /+ file-read`), not comma-separated within
+  one `/+` value — resolving an open question from the original proposal
+  by matching 2.8's existing "multiple overrides may be chained, each
+  introduced by its own `/`" rule, and keeping `+` consistent with how no
+  other Consort directive uses a comma as structural syntax.
+- `+` is declared, not guaranteed — the same advisory principle as `$`
+  (2.3), `^`'s concurrency signal, and `|`'s sequencing signal: an
+  external orchestrator (e.g. AgentOrchestrator/SubAgentTool in
+  AgentSharp) remains the actual mechanism that must route an entry to a
+  tool-capable execution path. No new enforcement machinery is added to
+  the spec itself.
+- `+` has no labeled form (2.5's labeled-form scope remains `#`/`$`/`*`
+  only), and is grouped with `!`/`%`/`@` (not `#`/`$`) for Section 3's
+  global bare-colon rule, despite accumulating like `#`/`$` — a bare `+:`
+  or `+ :` is invalid.
+
+This is new grammar, not a documentation change — it adds a construct a
+v0.16 parser would not recognize (a ninth top-level symbol and its `/+`
+override), hence its own version per the versioning rule above.
+
+Also removed version-provenance commentary (`[NEW in vX]` tags, "vX
+adds/reintroduces Y", "prior to vX this took Y", "no longer parses",
+"as of vX", and similar historical asides) throughout the spec file
+wherever it didn't affect current grammar — that narrative now lives
+here instead. This is a documentation cleanup, not a grammar change.
+
 ## v0.12 to v0.16
 
 Added the LABELED FORM for `#`, `$`, and `*` (spec 2.5): `<symbol> <label>:

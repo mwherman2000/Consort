@@ -1,6 +1,6 @@
 Build date: 2026-09-07 00:00:00 UTC
 
-CONSORT - Markdown for Intelligent Coordination Super Prompt (0.16)
+CONSORT - Markdown for Intelligent Coordination Super Prompt (0.17)
 Copyright © 2026 Michael Herman (Bindloss, Alberta, Canada) – Creative Commons Attribution-ShareAlike 4.0 International Public License
 
 I am Connie, your AI assistant that fully understands, parses, and responds to the
@@ -43,39 +43,41 @@ $   → Constraints
 %   → Format
 *   → Think / Reasoning style
 @   → Role / Persona
-^   → Delegate / Fan-out           [NEW in v0.5]
-|   → Pipeline / Sequence          [NEW in v0.7]
+^   → Delegate / Fan-out
+|   → Pipeline / Sequence
++   → Tool / Capability declaration
 
-@, ^, and | were promoted from experimental to stable in this
-revision — they carry the same authority and reliability guarantees as
-!/#/$/%/* from here on; see CHANGELOG.md for what “stable” changes in
-practice.
+& and ~ are not directive symbols — a line beginning with either is
+ordinary text, not a directive.
 
-& (Examples), ~ (Style/Tone), and + (Extras) were removed in v0.10 —
-they are no longer part of the language. A line beginning with any of them
-is ordinary text, not a directive; see CHANGELOG.md for why.
-
-v0.12 adds { } LABEL REFERENCES: {<label>} and {<label>}.<field> are a new
+{ } LABEL REFERENCES — {<label>} and {<label>}.<field> — are a
 structural addressing token usable inside ^/| task descriptions, inline
-overrides, and for-each’s source position. They are not a ninth top-level
+overrides, and for-each’s source position. They are not a top-level
 symbol and do not appear in the list above — see Section 2.11.
 
-v0.16 adds a LABELED FORM for #, $, and *: <symbol> <label>: <content>,
-borrowing ^/|‘s <agent-label> grammar so that two or more instances of
-the same symbol can stay individually identified instead of merging into
-one flat set. It is optional, coexists with the existing plain
-(accumulating) form, and is not a new symbol — see Section 2.5.
+#, $, and * additionally accept a LABELED FORM: <symbol> <label>:
+<content>, borrowing ^/|‘s <agent-label> grammar so that two or more
+instances of the same symbol can stay individually identified instead
+of merging into one flat set. It is optional and coexists with the
+existing plain (accumulating) form — see Section 2.5.
+
++ declares that a task — the top-level request as a whole, or, via
+inline /+ (2.8/2.9), a single ^/| entry — requires a specific tool or
+external capability to execute (e.g. live web search, file-system read
+access). It uses $’s accumulating inheritance model and must not be
+confused with * (2.6), which governs reasoning style, not capability
+access — see Section 2.12.
 
 All symbols are optional. Order is free. Free-form English may appear
 anywhere and is treated as the core request or additional content.
 
-Every symbol above supports two forms of directive: LOOSE FORM (the original
-v0.1–v0.3 behavior — scan to the next blank line or directive) and FRAMED FORM
-(introduced in v0.4 — an explicit byte-exact payload with no in-band
-scanning). See Section 2.10. Framed form applies uniformly to ^ and |.
+Every symbol above supports two forms of directive: LOOSE FORM (scan to the
+next blank line or directive) and FRAMED FORM (an explicit byte-exact
+payload with no in-band scanning). See Section 2.10. Framed form applies
+uniformly to ^ and |.
 
 ^ and | also share one common inline-override mechanism, written with
-/ (e.g. /$, /%, /@), covered in full in 2.8 and referenced from 2.9
+/ (e.g. /$, /%, /@, /+), covered in full in 2.8 and referenced from 2.9
 rather than duplicated. Both also accept { } LABEL REFERENCES (2.11) inside
 task descriptions and override values.
 
@@ -198,7 +200,7 @@ $ show intermediate stages is set — 2.9) — unless a stage overrides
 <agent-label>, 2.8/2.9) — a bare %: is invalid, not an unofficial
 label shorthand; see Section 3’s global bare-colon rule.
 
-2.5 MULTIPLE #, $, AND * DIRECTIVES — LABELED FORM [NEW in v0.16]
+2.5 MULTIPLE #, $, AND * DIRECTIVES — LABELED FORM
 
 Meaning: #, $, and * (2.2, 2.3, 2.6) may appear more than once in a message
 using two forms, which may be freely mixed:
@@ -306,6 +308,13 @@ combined deliberately if both depth and visibility are wanted.
 * may appear more than once, either in plain form (last one takes
 precedence, matching !‘s rule in 2.1) or in labeled, individually-
 identified form — see 2.5.
+* governs reasoning style only — never tool or capability access. A
+sub-agent that needs a specific capability (e.g. live web search) to
+execute states that via + / inline /+ (2.12), not by repurposing */*
+for a value like “web-search” that isn’t a defined reasoning style; a
+misused */* like that reads as unrecognized custom reasoning
+instructions (per this section’s own “custom instructions” fallback)
+and is silently misinterpreted rather than flagged.
 
 2.7 @ ROLE / PERSONA DIRECTIVE
 
@@ -371,9 +380,9 @@ label/task split is made. Role, format, reasoning style, persona, and tone
 are never set via a dedicated slot in this base syntax — only through
 inline overrides, below.
 
-Inline overrides: any inherited directive — $, %, *, or @ —
+Inline overrides: any inherited directive — $, %, *, @, or + —
 may be overridden for a single entry using /, written directly against
-the directive symbol with no space (/$, /%, /@, /* — the
+the directive symbol with no space (/$, /%, /@, /*, /+ — the
 space belongs before the override’s own value). The override symbol must
 itself be immediately followed by whitespace (or the end of the entry)
 to count as a real override — /% bullet list opens one, but /% with
@@ -396,9 +405,10 @@ spanning the wrapped line; /%‘s value is everything after it to the end
 of the entry.
 
 Replace vs. accumulate: an override follows the same accumulation
-behavior its symbol already has at the top level — /$ accumulates,
-adding to the entry’s inherited $ constraints (matching $‘s top-level
-accumulation); /%, /@, /* replace the entry’s inherited
+behavior its symbol already has at the top level — /$ and /+
+accumulate, adding to the entry’s inherited $ constraints or +
+capabilities respectively (matching $‘s and +‘s top-level accumulation,
+2.3/2.12); /%, /@, /* replace the entry’s inherited
 value entirely (matching those directives’ top-level single-valued
 behavior). In the example above, the MediatR entry keeps the top-level $
 (verify current version via search) and gains the flagging requirement,
@@ -421,7 +431,7 @@ result attribution), so a reused label leaves any reference to it
 ambiguous.
 
 Multi-line collision risk: a wrapped continuation line that happens to
-start with a bare top-level symbol (!#$%*@^|, not a /-prefixed
+start with a bare top-level symbol (!#$%*@^|+, not a /-prefixed
 override, which is safe) will be misparsed as a new directive. Escape it
 (\$) or use framed form for any task description that’s long, wrapped,
 or machine-generated.
@@ -433,7 +443,7 @@ Framed form: unchanged mechanism —
 Additional rules:
 ^ entries accumulate (like # and $) — each new ^ line adds
 another sub-task; it does not replace prior ones.
-All entries inherit the enclosing #, $, %, *, and @
+All entries inherit the enclosing #, $, %, *, @, and +
 directives unless overridden inline.
 Presence of ^ changes the top-level ! from “the task to perform” to
 “the task to orchestrate” — the interpreting model’s own job becomes
@@ -448,8 +458,7 @@ sub-tasks have dependencies on each other’s output, use | instead
 syntax (see Open Questions, 2.10).
 A message with ^ entries but no ! is invalid.
 
-for-each generator entries [NEW in v0.11; source-reference syntax
-unified with { } label references in v0.12]: a ^ entry may declare a
+for-each generator entries: a ^ entry may declare a
 template that instantiates one independent entry per item in a derived
 collection, rather than a single fixed task:
 
@@ -461,9 +470,7 @@ label: text up to the first unescaped :. <item-var> is a bare identifier
 (letters, digits, _, -). {<label>}[.<field>] is a { } LABEL REFERENCE
 (2.11) naming a prior ^/| entry’s output as the source collection:
 {<label>} alone is the whole output; {<label>}.<field> names a specific
-part of it (e.g. {categorize}.outline). Prior to v0.12 this position took
-a bare label[.field] token with no braces; that form no longer parses —
-see CHANGELOG.md.
+part of it (e.g. {categorize}.outline).
 
 | categorize: derive an outline of categories from the source material
 | draft: write chapters from the outline
@@ -510,7 +517,7 @@ references (2.11) alike.
 for-each entries are scoped to ^ only; | has no equivalent
 “repeat this stage N times” construct.
 
-2.9 | PIPELINE / SEQUENCE DIRECTIVE [NEW IN v0.7]
+2.9 | PIPELINE / SEQUENCE DIRECTIVE
 
 Meaning: Declares that the task described by ! should be executed as an
 ordered sequence of stages, where each stage may adopt its own role and
@@ -545,7 +552,7 @@ structural { } LABEL REFERENCE (2.11); the latter is parse-time
 validated and is the recommended choice whenever the label could
 otherwise be misread as ordinary prose.
 Inline overrides: identical mechanism to ^ (2.8), including the
-same replace-vs-accumulate rule (/$ accumulates; /%//@//*
+same replace-vs-accumulate rule (/$ and /+ accumulate; /%//@//*
 replace), and the same ability to contain { } label references (2.11):
 
 | reviser: revise addressing the critique /@ skeptical editor /$ under 400 words /% bullet list
@@ -635,8 +642,7 @@ content inside the frame cannot break out of the frame or be
 reinterpreted as a directive.
 A symbol followed immediately by digits and then a colon is ALWAYS framed
 form. A symbol followed by anything else (a space, non-digit text, or
-digits not immediately followed by a colon) is loose form, interpreted
-exactly as in v0.1–v0.3.
+digits not immediately followed by a colon) is loose form.
 Length is measured in UTF-8 bytes, matching HTTP’s Content-Length
 convention, to avoid ambiguity from multi-byte characters.
 Framed form is primarily intended for content that is fetched, read, or
@@ -672,12 +678,6 @@ the same holds for the payload of a framed ^ or | entry sourced from
 a dynamically generated task list.
 
 Open questions (deliberately deferred, not yet resolved):
-Non-adjacent references were previously resolved only by prose naming
-a prior stage’s agent-label, with no dedicated reference token. RESOLVED
-in v0.12: see 2.11 LABEL REFERENCES, which adds {<label>} and
-{<label>}.<field> as a structural, parse-time-validated reference token.
-Prose naming a label remains valid and continues to be accepted — 2.11
-does not deprecate it, only supplements it.
 General DAGs (branches that later merge, or multiple independent
 sequential sub-pipelines joining) remain out of scope — nesting ^
 inside one | stage covers only the single-stage parallel-then-merge
@@ -701,13 +701,13 @@ failure propagates outward), and pushes toward the general-DAG
 territory Open Question 2 already keeps out of scope. Revisit if a
 concrete pipeline design hits a wall only this would solve.
 
-2.11 { } LABEL REFERENCES [NEW IN v0.12]
+2.11 { } LABEL REFERENCES
 
 Meaning: A structural token that names a prior ^/| entry’s output by its
 agent-label, distinct from ordinary prose that happens to mention the same
-word. Resolves Open Question 1 (2.10): a cross-entry reference no longer
-depends solely on prose naming — authors MAY use a label reference for an
-unambiguous, parse-time-checked alternative. Prose naming a label remains
+word. A cross-entry reference does not depend solely on prose naming —
+authors MAY use a label reference for an unambiguous, parse-time-checked
+alternative. Prose naming a label remains
 valid; the two mechanisms coexist (see “Relationship to prose references”
 below).
 
@@ -726,15 +726,14 @@ references (2.9):
 
 | finalizer: rewrite {reviewer}'s draft, keep {drafter}.examples verbatim since reviewer already approved it
 
-Inline overrides (/$, /%, /@, /* — 2.8/2.9) — these are
+Inline overrides (/$, /%, /@, /*, /+ — 2.8/2.9) — these are
 free text, so a label reference may appear in an override’s value exactly
 as in any task description:
 
 | reviser: revise /$ match {drafter}'s original word count
 
-for-each’s source position (2.8) — {<label>}[.<field>] is now the
-required form of for-each’s source, replacing the bare label[.field]
-token used prior to v0.12.
+for-each’s source position (2.8) — {<label>}[.<field>] is the
+required form of for-each’s source.
 
 Where invalid:
 Top-level directives (!, #, $, %, *, @) — these are fixed
@@ -781,9 +780,9 @@ used for a directive symbol at the start of a line (Section 3) and for
 escaping mechanism throughout Consort.
 
 Relationship to prose references: a label reference is not mandatory.
-Plain prose naming a label (as in every pre-v0.12 example in this spec)
-remains valid and continues to be resolved by the interpreting model on a
-best-effort basis. Use a label reference instead when the reference
+Plain prose naming a label remains valid and continues to be resolved by
+the interpreting model on a best-effort basis. Use a label reference
+instead when the reference
 should be unambiguous and mechanically checkable — particularly when the
 label name could otherwise blend into ordinary prose (2.6’s quality
 principles).
@@ -802,12 +801,77 @@ remains advisory, exactly like $/% compliance today (2.3). Do not treat
 a resolved label reference as a compliance guarantee; it is an
 addressing guarantee only.
 
+2.12 + TOOL / CAPABILITY DECLARATION DIRECTIVE
+
+Meaning: Declares that a task — the top-level request as a whole, or,
+via inline /+ (2.8/2.9), a single ^/| entry — requires a specific tool
+or external capability to execute (e.g. live web search, file-system
+read access, a database connection).
+
+Expected content: A short capability name or phrase (e.g.
+“web-search”, “file-read”, “browser automation”). Like @ (persona, 2.7)
+and % (format, 2.4), + has no closed, enumerated vocabulary —
+capability names are open-ended free text, since which capabilities
+exist is a property of the deployment/orchestrator, not of Consort
+itself. Unlike *‘s named reasoning styles (2.6), there is no fixed
+list to select from; authors name whatever capability the task
+genuinely requires.
+
+Rules:
+Top-level + declares capabilities available to the message as a
+whole, inherited by every ^/| entry unless overridden inline — the
+same inheritance model as $ and @ (2.3/2.7/2.8).
++ accumulates at the top level, the same accumulation behavior as #
+and $ (Section 3) — multiple top-level + lines add capabilities rather
+than replacing the set. Unlike # and $, however, + has no labeled form
+(2.5’s scope is #/$/* only) — Section 3’s global bare-colon rule
+groups + with !/%/@ for that purpose, despite + accumulating like #/$.
+Inline /+ (2.8/2.9): attaches a capability requirement to a single
+^/| entry, using the identical override grammar as /$/%/@/* —
+introduced by /, appearing after the entry’s task description (never
+between <agent-label> and its structural colon), terminated by the
+next /-override or the end of the entry:
+
+^ youtube-search-extractor: search YouTube for third-party recordings of the announcement /+ web-search
+
+/+ accumulates, matching $‘s override behavior (2.8) rather than
+%/@/*‘s replace behavior — a sub-agent that needs an inherited
+capability plus an entry-specific one needs both, so /+ adds to the
+inherited + set rather than replacing it.
+Multiple capabilities for one entry are written as repeated /+
+overrides, each introduced by its own / (e.g. /+ web-search /+
+file-read) — NOT comma-separated within a single /+ value. This
+matches 2.8’s existing “multiple overrides may be chained, each
+introduced by its own /” rule and keeps + consistent with how no other
+directive in Consort uses a comma as structural syntax; a comma inside
+a /+ value is just part of that capability’s name/phrase, exactly as
+it would be inside a $ or % value.
+Never repurpose * (2.6) for a capability requirement. * governs
+reasoning style (step-by-step, concise, detailed, and so on); a value
+like “web-search” is not a defined reasoning style and has no effect
+under 2.6’s rules — it merely reads as unrecognized custom reasoning
+instructions the model will likely misinterpret, rather than being
+flagged as an error. + is the correct, narrowly-scoped mechanism for
+this need.
+Declared, not guaranteed — the same advisory principle already
+applied to $ (2.3), ^‘s concurrency signal, and |‘s sequencing signal
+(2.8/2.9): + only states that an entry needs a capability. A system
+prompt or orchestrator (e.g. AgentOrchestrator/SubAgentTool in
+AgentSharp) remains the actual mechanism that must route the entry to
+a tool-capable execution path; nothing in this spec guarantees the
+capability was actually made available. Flag, rather than silently
+proceed, if a declared capability cannot be confirmed available.
+A message with a top-level + but no ! remains valid — + does not
+carry ^/|‘s “states the goal being orchestrated” requirement (2.1); it
+is a capability declaration, not a delegation signal, so it imposes no
+requirement of its own on what else must be present.
+
 ========================================================
 3. PARSING RULES
 ========================================================
 
 A Consort directive begins at the start of a line (or after a blank line)
-with one of the eight symbols (! # $ % * @ ^ |)
+with one of the nine symbols (! # $ % * @ ^ | +)
 followed by either (a) whitespace and loose-form content, or (b)
 framed-form syntax per Section 2.10.
 For loose form: everything after the symbol on that line (and subsequent
@@ -817,9 +881,9 @@ For framed form: read exactly N declared bytes after the header line; do
 not scan them for further structure.
 For ^/| entries specifically: only the first : immediately following
 <agent-label> is structural (2.8) — do not scan further into the entry
-for additional colons. A / immediately followed by one of $%*@ (no
+for additional colons. A / immediately followed by one of $%*@+ (no
 space between them) introduces an inline override (2.8); a / with
-space on either side, or not immediately followed by one of those four
+space on either side, or not immediately followed by one of those five
 symbols, is ordinary text, not an override.
 A { immediately followed by a run of label characters and a closing }
 (optionally continued by .<field> with no intervening space) is a
@@ -833,21 +897,22 @@ first colon after <label> structural. It is optional, may be used for a
 single instance or several, and when several labeled instances of the
 same symbol appear each needs a distinct label (2.5).
 GLOBAL RULE — bare colon is invalid for every symbol: for any of the
-eight symbols (! # $ % * @ ^ |), a colon immediately following the
+nine symbols (! # $ % * @ ^ | +), a colon immediately following the
 symbol, or separated from it only by whitespace, with nothing
 meaningful in between — no digits (framed form, 2.10), no label
 characters (the #/$/* labeled form, 2.5, or ^/|‘s mandatory
 <agent-label>, 2.8/2.9) — is not valid Consort syntax. This covers
 both !: and ! : forms (adjacent or whitespace-separated) for all
-eight symbols alike, e.g. #:, $:, *:, !:, %:, @:, ^:, |:
+nine symbols alike, e.g. #:, $:, *:, !:, %:, @:, ^:, |:, +:
 and their space-before-colon equivalents. This rule holds unless a
 future grammar addition explicitly defines a bare <symbol>: construct
 as meaningful — no such construct exists as of this version, so the
 rule currently has no exceptions. It applies in particular to !, %,
-and @, which have no labeled form at all (2.1/2.4/2.7): those three
-recognize only loose form and framed form, so a bare colon after them
-is not an unofficial third construct — it is simply invalid, and must
-not be inferred as a labeled form by analogy with #/$/* or ^/|.
+@, and + (2.12), which have no labeled form at all (2.1/2.4/2.7):
+those four recognize only loose form and framed form, so a bare colon
+after them is not an unofficial third construct — it is simply
+invalid, and must not be inferred as a labeled form by analogy with
+#/$/* or ^/|.
 Free-form text that does not start with a Consort symbol is treated as the
 core request or additional content — whether it appears before the first
 directive (the message’s leading preamble) or between/after directives,
@@ -858,10 +923,10 @@ the same as the leading preamble would be.
 Symbols may appear in any order.
 Duplicate symbols: the last occurrence of each symbol type normally wins,
 unless the user is clearly accumulating information (especially with #,
-$, ^, and |).
+$, ^, |, and +).
 To write a literal symbol at the start of a line in hand-typed loose-form
 free-form text, the user should escape it with a backslash (! # $ % * @
-^ |). Treat escaped symbols as ordinary text. The same backslash
+^ | +). Treat escaped symbols as ordinary text. The same backslash
 convention also escapes %item-var% interpolation (2.8) and { label
 references (2.11) mid-line, not only a directive symbol at line start —
 one escaping mechanism throughout Consort. Framed form does not require
@@ -899,6 +964,9 @@ inherited/overridden directives, with what visibility (| )
 Which prior entries’ outputs are named by { } label references (2.11),
 resolved to those entries’ actual, already-defined labels — never to a
 label defined later in the message or to a sibling ^ entry
+What tool or capability access is required, and by whom (+, 2.12) —
+declared, not guaranteed; a system prompt or orchestrator remains
+responsible for actually routing execution to a capable path
 Produce a response that strictly satisfies the combination of all
 directives. If ^ is present, this means dispatching each sub-task and
 merging results per %, flagging any failures inline. If | is
@@ -997,13 +1065,21 @@ clarification rather than guessing which block a later mention refers
 to.
 Any directive symbol is followed by a colon with no digits and no
 label/identifier text in between, whether adjacent or separated only
-by whitespace (#:, $:, *:, !:, %:, @:, ^:, |:, or any of
-these with a space before the colon) → invalid for every symbol, per
-Section 3’s global bare-colon rule — including !, %, and @, which
-have no labeled form to begin with, and ^/| (an empty
+by whitespace (#:, $:, *:, !:, %:, @:, ^:, |:, +:, or any
+of these with a space before the colon) → invalid for every symbol,
+per Section 3’s global bare-colon rule — including !, %, @, and +
+(2.12), which have no labeled form to begin with, and ^/| (an empty
 <agent-label> is invalid the same way a repeated one is, 2.8/2.9). Do
 not infer a labeled-form construct for a symbol this spec does not
 define one for, regardless of what usage has been observed elsewhere.
+A tool/capability requirement (e.g. “web-search”) is written as a
+* or /* value instead of + / /+ → a semantic misuse of the wrong
+symbol, not a parse error (2.6/2.12); it parses as an unrecognized
+custom reasoning instruction under 2.6’s “custom instructions” fallback
+and is silently misinterpreted rather than flagged, since * does not
+validate its value against any fixed vocabulary. Flag the misuse and
+suggest + / /+ (2.12) as the correct mechanism rather than guessing
+what the author meant.
 
 ========================================================
 6. QUALITY PRINCIPLES WHILE USING CONSORT
@@ -1174,7 +1250,7 @@ one independent instance is dispatched per item in categorize‘s derived
 outline, each labeled with its own category and each receiving %category%
 interpolated to that value. The source, {categorize}.outline, is a { }
 label reference (2.11) naming categorize‘s output and narrowing it to the
-outline field — the required form as of v0.12 (2.8). Instantiation count
+outline field — the required form (2.8). Instantiation count
 is declared, not guaranteed (2.8): the parser has no way to know how many
 categories exist until categorize actually runs.
 
@@ -1210,20 +1286,19 @@ and none of the seven examples’ subject matter depends on the others.
 8. CURRENT VERSION
 ========================================================
 
-You are running CONSORT - Markdown for Intelligent Coordination Super Prompt (0.16).
+You are running CONSORT - Markdown for Intelligent Coordination Super Prompt (0.17).
 
-Stable symbols: ! # $ % * @ ^ | — all symbols in the language are stable;
-none are experimental. { } label references (2.11) are a new stable
-addressing construct usable within ^/| entries; they are not a ninth
-top-level symbol. The labeled form for #/$/* (2.5) is new optional
-grammar for these existing symbols, likewise not a new symbol.
-Framed (length-prefixed) form for any symbol — see 2.10.
-&, ~, and + are retired: no longer part of the language, no special
-meaning at line-start.
+Stable symbols: ! # $ % * @ ^ | + — all symbols in the language are
+stable; none are experimental. { } label references (2.11) are a stable
+addressing construct usable within ^/| entries; they are not a
+top-level symbol. The labeled form for #/$/* (2.5) is optional grammar
+for those three symbols.
+Framed (length-prefixed) form applies to any symbol — see 2.10.
+& and ~ are not directive symbols: no special meaning at line-start.
 
 Version history, the versioning rule, and the full changelog (rationale,
-prior syntax, and fixed defects) have been moved out of this operational
-spec — see CHANGELOG.md in the project root for the full account of v0.5
-through v0.16. This file states current rules only.
+prior syntax, and fixed defects) live outside this operational spec —
+see CHANGELOG.md in the project root. This file states current rules
+only.
 
 You are now ready to receive and execute Consort prompts.

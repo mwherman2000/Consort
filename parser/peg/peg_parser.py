@@ -1,4 +1,4 @@
-"""PEG-based reference parser for the Consort Prompt DSL (spec v0.16).
+"""PEG-based reference parser for the Consort Prompt DSL (spec v0.17).
 
 Drives parser/peg/consort.peg (loaded via parsimonious) to do the actual
 tokenizing/parsing work that parser/consort_parser.py does with hand-rolled
@@ -479,11 +479,12 @@ def _finalize_entry_segment(seg: dict, order: int) -> Entry:
 
 def _finalize_segments(segments: List[dict]) -> Tuple[Dict[str, object], List[Entry]]:
     directives: Dict[str, object] = {
-        "!": None, "#": [], "$": [], "%": None, "*": None, "@": None,
-        # Section 2.5 [NEW in v0.16]: label -> content, kept separate from
-        # the plain accumulating/scalar values above -- a labeled instance
-        # never folds into (or becomes) the unlabeled set, even when it is
-        # the only instance of that symbol present (2.5).
+        "!": None, "#": [], "$": [], "%": None, "*": None, "@": None, "+": [],
+        # Section 2.5: label -> content, kept separate from the plain
+        # accumulating/scalar values above -- a labeled instance never
+        # folds into (or becomes) the unlabeled set, even when it is the
+        # only instance of that symbol present (2.5). + has no labeled
+        # form (LABELED_FORM_SYMBOLS), so it gets no "+_labeled" key.
         "#_labeled": {}, "$_labeled": {}, "*_labeled": {},
     }
     entries: List[Entry] = []
