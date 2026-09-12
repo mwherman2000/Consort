@@ -54,6 +54,19 @@ Frame strategic question → Understand market → Investigate competitors → A
 
 Define quality objectives → Understand system → Inspect/test → Diagnose defects → Prioritize → Remediate → Test → Evaluate → Adapt
 
+### Summary
+
+| General function | Medical | Dinner menu | Competitive analysis | Software quality |
+|---|---|---|---|---|
+| **Frame** | Patient problem | Occasion & guests | Strategic question | Quality objective |
+| **Understand** | History/symptoms | Preferences/constraints | Market situation | Architecture/codebase |
+| **Investigate** | Tests/examination | Ingredients/options | Competitor research | Testing/inspection |
+| **Decide** | Diagnosis/treatment plan | Menu selection | Strategy | Remediation priorities |
+| **Act** | Treat | Cook/serve | Execute strategy | Fix/refactor/deploy |
+| **Evaluate** | Clinical response | Guest response | Market response | Test/quality results |
+| **Adapt** | Change treatment | Adjust menu | Revise strategy | Correct/retest |
+| **Follow-up** | Continued care | Lessons for next event | Ongoing monitoring | Regression/continuous quality |
+
 <img width="1536" height="1024" alt="Consort Logo 0 12" src="assets/consort-banner.png" style="max-width: 100%; height: auto;" />
 
 > Consort enables humans, software and machines to participate in a common world by providing a shared conceptual and operational frame of reference for action.        
