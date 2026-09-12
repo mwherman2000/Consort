@@ -38,6 +38,8 @@ Same coordination substrate. Different participants, knowledge, capabilities, ev
 
 Consort coordinates problem solving as an evidence-driven, closed-loop process of understanding, deciding, acting, evaluating, and adapting.
 
+See [docs/TAXONOMY.md](docs/TAXONOMY.md) for this same loop worked out across all twelve domains listed above, including the eight not broken out below.
+
 ### Medical Care
 
 Observe → Assess → Investigate → Diagnose → Plan → Treat → Monitor → Reassess → Adapt
