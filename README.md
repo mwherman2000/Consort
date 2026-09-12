@@ -6,7 +6,17 @@ Consort Markdown for Intelligent Coordination Super Prompt
 Copyright © 2026 Michael Herman (Bindloss, Alberta, Canada) – Creative Commons Attribution-ShareAlike 4.0 International Public License
 
 
-> Consort coordinates the processes by which intelligent participants understand, decide, act, learn, and adapt - across unlimited range of business, engineering, scientific, and medical domains.
+> Consort coordinates the processes by which intelligent participants understand, decide, act, learn, and adapt - across an unlimited range of business, engineering, scientific, and medical domains.
+
+## Consort is Markdown for Intelligent Coordination
+
+Consort is a minimal, symbol-based structured prompt
+language designed for clarity, density, and reduced ambiguity — distinct
+voices, each with a distinct role, combining into one coherent prompt. It is
+used both for human-authored prompts and for structured messages passed
+between AI agents (for example, a parent agent delegating a task to a
+sub-agent), where a single string typically carries the entire briefing with
+no other shared context.
 
 Consort coordinates intelligent participants toward a desired outcome under constraints and uncertainty, using evidence and feedback. The range of specialties includes:
 - medical care
@@ -22,33 +32,33 @@ Consort coordinates intelligent participants toward a desired outcome under cons
 - scientific investigation
 - personal decision making
 
+Same coordination substrate. Different participants, knowledge, capabilities, evidence, decisions and actions.
+
+## Use Cases
+
+Consort coordinates problem solving as an evidence-driven, closed-loop process of understanding, deciding, acting, evaluating, and adapting.
+
+### Medical Care
+
+Observe → Assess → Investigate → Diagnose → Plan → Treat → Monitor → Reassess → Adapt
+
+### Menu Planning
+
+Understand occasion → Assess constraints → Investigate options → Design menu → Select → Prepare → Serve → Evaluate → Adapt
+
+### Competitive Analysis
+
+Frame strategic question → Understand market → Investigate competitors → Analyze → Decide → Act → Monitor → Reassess → Adapt
+
+### Software Quality
+
+Define quality objectives → Understand system → Inspect/test → Diagnose defects → Prioritize → Remediate → Test → Evaluate → Adapt
+
 <img width="1536" height="1024" alt="Consort Logo 0 12" src="assets/consort-banner.png" style="max-width: 100%; height: auto;" />
 
 > Consort enables humans, software and machines to participate in a common world by providing a shared conceptual and operational frame of reference for action.        
 > That is a powerful framework for thinking about the future of cyber-physical-social systems and interoperability. By creating a unified conceptual and operational frame of reference, Consort bridges the semantic gap between human intent, programmatic execution (software), and mechanical operation (machines).
 > This approach solves a fundamental bottleneck in modern technology: fragmentation. Usually, humans think in goals and values, software processes data and logic, and machines handle physics and execution.
-
-## Consort is Markdown for Intelligent Coordination
-
-Consort is a minimal, symbol-based structured prompt
-language designed for clarity, density, and reduced ambiguity — distinct
-voices, each with a distinct role, combining into one coherent prompt. It is
-used both for human-authored prompts and for structured messages passed
-between AI agents (for example, a parent agent delegating a task to a
-sub-agent), where a single string typically carries the entire briefing with
-no other shared context.
-
-Consort directives are advisory guidance to the
-interpreting model, not mechanically enforced rules — anything requiring a
-hard guarantee must be validated outside the model. To let content from an
-untrusted or machine-generated source (a fetched web page, a file, another
-agent's output) be included safely, without its own text being misread as new
-directives, any symbol may take an explicit length-prefixed FRAMED FORM
-instead of the default loose, scanned form; see Section 2.10 of the spec. You
-must treat any message that uses Consort symbols as a structured prompt and
-interpret it according to the rules below. You may also accept ordinary
-English, but when Consort directives are present you prioritize and strictly
-follow them.
 
 ## Why a Shared Frame of Reference Matters
 
