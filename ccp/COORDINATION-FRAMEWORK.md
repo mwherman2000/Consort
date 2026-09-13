@@ -11,7 +11,7 @@ expressed at three independent, separately-maintained levels:
 1. **Consort** — the language itself (currently v0.20; see
    [`../CHANGELOG.md`](../CHANGELOG.md)).
 2. **The CCP framework** (this document plus
-   [`ccp-coordinator.consort`](ccp-coordinator.consort)) — the
+   [`ccp.consort`](ccp.consort)) — the
    domain-agnostic pattern: six orthogonal functions every coordinated
    process passes through, and the conventions for expanding them into
    concrete stages.
@@ -70,7 +70,7 @@ sequential parts, each building on the last:
 1. **The Consort specification**
    (`CONSORT Markdown for Intelligent Coordination.txt`) — teaches the
    model the DSL itself.
-2. **`ccp-coordinator.consort`** — a complete, standalone Consort message
+2. **`ccp.consort`** — a complete, standalone Consort message
    establishing the CCP framework generically: the six functions, and
    constraints that apply to any CCP-based process regardless of domain
    (distinguishing observed fact from interpretation, preserving

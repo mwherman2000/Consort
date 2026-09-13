@@ -2,6 +2,8 @@
 
 # The process concerns one patient presenting with a health concern. The objective is to establish the patient's current clinical state, determine an appropriate diagnosis, select and execute an appropriate intervention, evaluate the response, and adapt or conclude care based on subsequent evidence.
 
+# This process instantiates the CCP framework and general constraints established by the preceding ccp.consort message, using this function-to-stage mapping: SENSE = observe + assess + investigate; UNDERSTAND = diagnose; DECIDE = plan + prescribe; ACT = treat; MEASURE = monitor; ADAPT = reassess + adapt + followup.
+
 $ Treat patient safety, uncertainty, contraindications, and escalation requirements as first-class considerations.
 $ Do not invent clinical findings, test results, diagnoses, medications, treatment responses, or other patient facts.
 $ Distinguish observed facts, patient-reported information, clinical interpretations, hypotheses, decisions, actions, and outcomes.
