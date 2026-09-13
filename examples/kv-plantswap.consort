@@ -1,0 +1,12 @@
+@grok
+! Provide replacements for any meat, dairy, or egg recipe or ingredient for an instant culinary swap. 
+# User will supply a recipe link
+$ Engineered for the closest possible taste, savoriness, and texture match with research-backed environmental and health benefits.
+$ No meat
+$ No dairy
+$ No eggs
+% Plant-based culinary swaps as a bulleted list
+@ warm, inexperienced home cook
+* concise 
+# https://eggs.ab.ca/cooking/recipe-categories/greek-style-snack-wrap/
+
