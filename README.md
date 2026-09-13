@@ -32,7 +32,7 @@ Consort coordinates intelligent participants toward a desired outcome under cons
 - scientific investigation
 - personal decision making
 
-Same coordination substrate. Different participants, knowledge, capabilities, evidence, decisions and actions.
+Same coordination substrate. Different participants, knowledge, capabilities, evidence, decisions and actions. Works with any LLM or AI client (ideally ones the support parallel agents and tools).
 
 ## Use Cases
 
