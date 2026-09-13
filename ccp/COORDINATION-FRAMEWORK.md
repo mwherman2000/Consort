@@ -107,12 +107,6 @@ checkpointed prior results supplied as `#` context, ideally in framed
 form (spec 2.10), since it is another turn's output being re-injected
 and should not be re-scanned as live syntax.
 
-## Status
-
-This framework has no formal version yet — it's early enough (one domain
-instantiation) that a version number would be premature. Revisit once a
-second domain-specific prompt exists to compare against.
-
 ## Background
 
 [`TAXONOMY.md`](TAXONOMY.md) in this folder captures the exploratory
