@@ -598,6 +598,21 @@ Failure/halt behavior: default is halt-and-report at the failing
 stage, not silent continuation with degraded input — sequential stages
 depend on each other’s output, so continuing past a failure risks
 feeding bad input forward.
+Closed-loop / iterative processes: | describes a single linear pass
+through its stages — it has no construct for looping back to an
+earlier stage, branching, or repeating until a condition holds
+(general DAGs remain out of scope, 2.10). A process that conceptually
+loops (e.g., monitor → reassess → adapt → treat → monitor again) is
+still expressed as one | pipeline covering a single pass; the
+loop-back condition itself is stated as ordinary prose, typically in
+the relevant stage’s task description or a $ constraint (e.g.,
+$ monitoring may require returning to investigation, diagnosis,
+planning, or treatment when new evidence warrants it). Whether and
+when to actually re-invoke the pipeline, or a suffix of it, is the
+responsibility of whatever system or orchestrator drives the
+interpreting model across turns — the same advisory-only principle
+already applied throughout (2.3) — not something | executes or
+enforces structurally.
 Nested ^ within a | stage: a | stage’s task may include a
 scoped ^ fan-out via indentation:
 
@@ -711,7 +726,9 @@ Open questions (deliberately deferred, not yet resolved):
 General DAGs (branches that later merge, or multiple independent
 sequential sub-pipelines joining) remain out of scope — nesting ^
 inside one | stage covers only the single-stage parallel-then-merge
-case.
+case. This does not block closed-loop or iterative processes, though:
+those are already handled without new syntax by stating the loop-back
+condition as prose (2.9) rather than by | executing an actual cycle.
 Halt-on-failure override (e.g. $ continue on failure) does not
 yet exist; deferred until a concrete use case shapes it.
 Symbol collision risk for | (shell pipe, Markdown table
