@@ -3,7 +3,8 @@ Consort - Markdown for Intelligent Coordination Super Prompt
 
 (previously known as Consort Structured English for AI Super Prompt DSL)
 
-Copyright © 2026 Michael Herman (Bindloss, Alberta, Canada) – Creative Commons Attribution-ShareAlike 4.0 International Public License
+Copyright © 2026 Michael Herman (Bindloss, Alberta, Canada) – Creative Commons Attribution-ShareAlike 4.0 International Public License.
+Made in Canada
 
 
 > Consort coordinates the processes by which intelligent participants understand, decide, act, learn, and adapt - across an unlimited range of business, engineering, scientific, and medical domains.
