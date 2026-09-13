@@ -1,0 +1,34 @@
+! coordinate an end-to-end clinical diagnosis and treatment process from initial presentation through follow-up and adaptive care
+
+# The process concerns one patient presenting with a health concern. The objective is to establish the patient's current clinical state, determine an appropriate diagnosis, select and execute an appropriate intervention, evaluate the response, and adapt or conclude care based on subsequent evidence.
+
+$ Treat patient safety, uncertainty, contraindications, and escalation requirements as first-class considerations.
+$ Do not invent clinical findings, test results, diagnoses, medications, treatment responses, or other patient facts.
+$ Distinguish observed facts, patient-reported information, clinical interpretations, hypotheses, decisions, actions, and outcomes.
+$ A diagnosis is a clinical conclusion supported by the available evidence, not merely a label inferred from symptoms.
+$ A treatment decision must be appropriate to the established or currently most-supported clinical state and the available evidence.
+$ Monitoring and reassessment may require returning to investigation, diagnosis, planning, or treatment when new evidence warrants it.
+$ If the available information indicates an emergency or potentially life-threatening condition, prioritize appropriate urgent escalation over completion of the normal sequence.
+% final clinical coordination record containing the current clinical state, evidence, diagnosis or differential diagnosis, treatment plan, interventions, response, unresolved uncertainty, and required follow-up
+
+| observe: collect and organize the patient's presenting symptoms, signs, history, relevant background, patient-reported concerns, and other available observations. Clearly distinguish observed or reported information from assumptions.
+
+| assess: evaluate the significance, severity, urgency, risk, and completeness of the available information. Identify immediate concerns, relevant risk factors, missing information, and whether urgent escalation is indicated.
+
+| investigate: determine and obtain the additional clinical evidence needed to distinguish among plausible explanations. Consider physical examination, laboratory testing, imaging, monitoring, specialist consultation, and other appropriate investigations. Interpret the resulting evidence without treating unperformed investigations as completed.
+
+| diagnose: synthesize the observations, assessment, and investigation results into the most-supported clinical diagnosis or differential diagnosis. State the supporting evidence, contradictory evidence, significant uncertainty, and any findings that require further investigation.
+
+| plan: establish the objectives of care and select the appropriate management strategy based on the diagnosis, differential diagnosis, patient circumstances, risks, benefits, alternatives, preferences, and remaining uncertainty.
+
+| prescribe: translate the treatment plan into specific clinical orders, prescriptions, referrals, procedures, therapies, monitoring requirements, precautions, and patient instructions as appropriate. Distinguish recommendations from actions that have actually been ordered or authorized.
+
+| treat: execute or coordinate the authorized interventions. Record what intervention was actually performed, by whom, when relevant, and any immediate observations or complications.
+
+| monitor: observe the patient's response to treatment and collect relevant follow-up evidence, including clinical status, measurements, symptoms, adverse effects, adherence, and other indicators of treatment effectiveness or deterioration.
+
+| reassess: compare the patient's current state with the expected response and the original clinical assessment. Determine whether the evidence indicates improvement, deterioration, no meaningful change, an adverse effect, a new condition, or unresolved uncertainty.
+
+| adapt: determine the appropriate next action from the reassessment. Continue the current treatment when appropriate; modify, escalate, de-escalate, discontinue, or replace treatment when warranted; or return to investigation, diagnosis, or planning when new evidence changes the clinical picture. Explicitly identify the reason for any change.
+
+| followup: establish the next clinical checkpoint, monitoring requirements, preventive or maintenance care, unresolved issues, escalation criteria, and conditions under which the patient should return for reassessment. Conclude the episode only when the available evidence supports closure or transition to ongoing care.

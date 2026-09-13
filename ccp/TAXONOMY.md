@@ -162,12 +162,12 @@ The Orthogonal Process Abstraction reduces these use case processes to six funda
 > 2. UNDERSTAND — interpret information and establish the clinical state
 > 3. DECIDE — select what ought to happen
 > 4. ACT — intervene
-> 5. MONITOR — measure consequences
+> 5. MEASURE — measure consequences
 > 6. ADAPT — modify the course based on consequences
 
 Then:
 
-> Sense → Understand → Decide → Act → Monitor → Adapt
+> Sense → Understand → Decide → Act → Measure → Adapt
 
 That abstraction is interesting in the context of the coordination architecture you've been developing because diagnosis and treatment become instances of a much more general sense–understand–decide–act–feedback cycle, rather than being treated as uniquely medical operations.
 
@@ -224,6 +224,50 @@ $ If the available information indicates an emergency or potentially life-threat
 | followup: establish the next clinical checkpoint, monitoring requirements, preventive or maintenance care, unresolved issues, escalation criteria, and conditions under which the patient should return for reassessment. Conclude the episode only when the available evidence supports closure or transition to ongoing care.
 ```
 
+## Looping Back Without Loop Syntax: A Checkpoint/Restart Pattern
+
+Per spec Section 2.9, `|` describes a single linear pass — Consort has no
+loop-back construct, and isn't getting one (general DAGs remain out of
+scope). The Closed-loop Control Process described above is real, but
+Consort's role in it is to describe *one pass*; the actual looping is
+implemented by whatever system dispatches the prompt, using a simple
+checkpoint/restart pattern:
+
+1. **Checkpoint each completed stage.** As the orchestrator runs the
+   pipeline, it persists each stage's output to disk, keyed by
+   agent-label and episode: `checkpoints/<episode-id>/<stage-label>.json`
+   — `observe.json`, `assess.json`, `investigate.json`, and so on through
+   `followup.json`.
+2. **On loop-back, construct a new, self-contained message — not a
+   resumption.** When `adapt` determines new evidence warrants returning
+   to `investigate` (per the `$ Monitoring and reassessment may require
+   returning to investigation...` line in the prompt above), the
+   orchestrator does not resume in-flight `|` state — there isn't any;
+   Consort messages carry no state between invocations (Section 1: "a
+   single string... with no other shared context"). Instead it builds a
+   fresh Consort message: the same `!`, a `|` pipeline covering only the
+   remaining stages (`investigate → diagnose → plan → prescribe → treat
+   → monitor → reassess → adapt → followup`), and the checkpointed prior
+   findings (`observe`, `assess`, the original diagnosis) supplied as `#`
+   context.
+3. **Frame the re-injected checkpoint data.** A prior stage's checkpointed
+   output is exactly the "another agent's output" case framed form
+   (Section 2.10) exists for. If `observe`'s findings happen to contain
+   text that looks like a Consort directive — a stray `#` inside quoted
+   patient notes, say — framing it on re-injection keeps it from being
+   misread as live syntax:
+
+   ```
+   #892:
+   <892 bytes of observe's checkpointed output, verbatim>
+   ```
+
+This is restart-with-context, not true resumption: nothing about `|`'s
+execution state survives between invocations, only the checkpointed data
+does. That is consistent with Consort's design, not a workaround for a
+missing feature — the loop lives entirely in the orchestrator, and
+Consort never needs to know it is looping at all.
+
 ## Two-Level CDP Process Architecture
 
 The following provides a useful two-level architecture: the six orthogonal coordination functions are generic, while Observe, Assess, Investigate, Diagnose, Plan, Prescribe, Treat, etc. are a particular domain's decomposition of them.
@@ -236,7 +280,7 @@ The following provides a useful two-level architecture: the six orthogonal coord
   → Plan + Prescribe  
 - ACT
   → Treat  
-- MONITOR
+- MEASURE
   → Monitor  
 - ADAPT
   → Reassess + Adapt + Follow-up
