@@ -38,7 +38,7 @@ Same coordination substrate. Different participants, knowledge, capabilities, ev
 
 Consort coordinates problem solving as an evidence-driven, closed-loop process of understanding, deciding, acting, evaluating, and adapting.
 
-See [ccp/TAXONOMY.md](ccp/TAXONOMY.md) for this same loop worked out across all twelve domains listed above, including the eight not broken out below, and [ccp/COORDINATION-FRAMEWORK.md](ccp/COORDINATION-FRAMEWORK.md) for the Consort Coordination Process (CCP) pattern this grew into.
+See [ccp/COORDINATION-FRAMEWORK.md](ccp/COORDINATION-FRAMEWORK.md) for the Consort Coordination Process (CCP) pattern this grew into.
 
 ### Medical Care
 
