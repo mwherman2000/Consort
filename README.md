@@ -18,7 +18,7 @@ between AI agents (for example, a parent agent delegating a task to a
 sub-agent), where a single string typically carries the entire briefing with
 no other shared context.
 
-Consort coordinates intelligent participants toward a desired outcome under constraints and uncertainty, using evidence and feedback. The range of specialties includes:
+Consort coordinates intelligent participants toward a desired outcome under constraints and uncertainty, using evidence and feedback. The range of specialties include:
 - medical care
 - meal/menu design
 - trip planning
