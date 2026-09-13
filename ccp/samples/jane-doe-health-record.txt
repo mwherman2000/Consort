@@ -1,0 +1,56 @@
+Patient: Jane Doe (fictitious patient, for illustration only -- "Jane Doe" is
+used deliberately as the standard placeholder name; this is not a real person
+or a real medical record)
+Age: 58
+Sex: female
+Race/ethnicity: Caucasian
+Location: Midwestern United States (state unspecified)
+Family/social: married, 2 adult children, non-smoker
+
+Presenting complaint: patient reports feeling unwell for the past 4 days.
+
+Reported symptoms:
+- Cough, non-productive, worsening over the past 2 days
+- Fever, subjective ("feeling hot"), no home thermometer reading recorded
+- Sore throat
+- Nasal congestion
+- Fatigue and general malaise
+- Mild shortness of breath with exertion
+- No chest pain reported
+- No nausea, vomiting, or diarrhea reported
+
+Vital signs at intake: Temp 100.8F | HR 92 | RR 20 | BP 132/84 | SpO2 95% on room air
+
+Blood work (drawn at intake):
+- WBC: 11.2 x10^9/L (reference range 4.5-11.0)
+- Hemoglobin: 13.1 g/dL (reference range 12.0-15.5)
+- Platelets: 250 x10^9/L (reference range 150-400)
+- Sodium: 138 mmol/L (reference range 136-145)
+- Potassium: 4.1 mmol/L (reference range 3.5-5.0)
+- Creatinine: 0.9 mg/dL (reference range 0.6-1.1)
+- Random blood glucose: 168 mg/dL (reference range 70-140, non-fasting)
+- CRP: 42 mg/L (reference range <10)
+
+Urinalysis (drawn at intake):
+- Color: pale yellow; Clarity: clear
+- Specific gravity: 1.018
+- pH: 6.0
+- Glucose: trace
+- Protein: negative
+- Ketones: negative
+- Leukocyte esterase: negative
+- Nitrites: negative
+- Blood: negative
+
+Past medical history:
+- Type 2 diabetes, managed with oral medication (specific medication not
+  provided at intake)
+- Recurrent respiratory infections in past winters, per patient report
+- One prior episode of pneumonia, approximately 3 years ago, treated as an
+  outpatient
+
+No known drug allergies reported. No current medication list supplied at
+intake beyond the diabetes history above.
+
+No diagnosis has been made at this point -- the above is intake
+observation and history only.
