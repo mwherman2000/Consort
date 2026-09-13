@@ -96,15 +96,15 @@ Define quality objectives → Understand system → Inspect/test → Diagnose de
 - [Reference Parser](#reference-parser)
 - [Documentation](#documentation)
 - [Versioning](#versioning)
-- [Aside: Data With DIDs (DWD)](#aside-data-with-dids-dwd)
 - [Contributing](#contributing)
 - [License](#license)
 
 ## Features
 
-- **Minimal, symbol-based syntax** — eight stable directive symbols (`!` `#`
-  `$` `%` `*` `@` `^` `|`) cover intent, context, constraints, format,
-  reasoning style, role, delegation, and pipelines.
+- **Minimal, symbol-based syntax** — nine stable directive symbols (`!` `#`
+  `$` `%` `*` `@` `^` `|` `+`) cover intent, context, constraints, format,
+  reasoning style, role, delegation, pipelines, and tool/capability
+  declaration.
 - **Human- and machine-friendly** — easy to hand-type, and dense enough to
   serve as a wire format for agent-to-agent messages.
 - **Free ordering, optional symbols** — every directive is optional, may
@@ -129,8 +129,8 @@ Consort is a prompting convention, not a library or service — there is
 nothing to install. To use it:
 
 1. Give the interpreting model the Consort system prompt so it knows how to
-   parse the syntax. The current version is
-   [`Consort 0.12 system prompt.txt`](<Consort 0.12 system prompt.txt>) —
+   parse the syntax. The current version (v0.20) is
+   [`CONSORT Markdown for Intelligent Coordination.txt`](<CONSORT Markdown for Intelligent Coordination.txt>) —
    paste its contents into your AI assistant's system prompt, or prepend it
    to a one-off conversation.
 2. Write prompts using the Consort symbols described below, mixed freely
@@ -152,15 +152,19 @@ nothing to install. To use it:
 | `@` | Role / Persona | The identity the model should adopt |
 | `^` | Delegate / Fan-out | Split a task across independent, parallel sub-agents |
 | `\|` | Pipeline / Sequence | Run an ordered sequence of dependent stages |
+| `+` | Tool / Capability declaration | Declares that a task or entry requires a specific tool or external capability |
 
-All eight symbols are stable. `&` (Examples), `~` (Style/Tone), and `+`
-(Extras) were retired in v0.10 and are no longer part of the language.
+All nine symbols are stable. `&` (Examples) and `~` (Style/Tone) were
+retired in v0.10 and are no longer part of the language. `+` was also
+retired in v0.10, then reintroduced in v0.17 with new, unrelated
+semantics (Tool / Capability declaration) — see `CHANGELOG.md` for the
+full history.
 
 ## Label References
 
 `{label}` and `{label}.field` — new in v0.12 — are a structural token for
 naming a prior `^`/`|` entry's output, usable inside `|` stage task
-descriptions, inline overrides (`/$` `/%` `/@` `/*`), and `for-each`'s
+descriptions, inline overrides (`/$` `/%` `/@` `/*` `/+`), and `for-each`'s
 source position:
 
 ```
@@ -176,8 +180,8 @@ also an error, since `^` entries are independent by definition. Like
 every other Consort directive, a resolved label reference only guarantees
 *which* content is meant — not that the receiving entry complies with
 what it's told to do with it. See Section 2.11 of the
-[full specification](<Consort 0.12 system prompt.txt>) for the complete
-grammar, escaping (`\{`), and edge cases.
+[full specification](<CONSORT Markdown for Intelligent Coordination.txt>)
+for the complete grammar, escaping (`\{`), and edge cases.
 
 ## Example
 
@@ -199,7 +203,7 @@ keeps each course description short.
 More worked examples — including framed form, `^` delegation, `|` pipelines,
 nested fan-out, generator (`for-each`) entries, and `{label}` references —
 are in Section 7 of the
-[full specification](<Consort 0.12 system prompt.txt>).
+[full specification](<CONSORT Markdown for Intelligent Coordination.txt>).
 
 ## Reference Parser
 
@@ -232,34 +236,17 @@ See [`parser/README.md`](parser/README.md) for details.
 ## Documentation
 
 The complete, authoritative specification — directive-by-directive rules,
-parsing rules, response behavior, edge cases, and the version changelog — is
-in [`Consort 0.12 system prompt.txt`](<Consort 0.12 system prompt.txt>).
+parsing rules, response behavior, and edge cases — is in
+[`CONSORT Markdown for Intelligent Coordination.txt`](<CONSORT Markdown for Intelligent Coordination.txt>).
+The version changelog lives separately, in [`CHANGELOG.md`](CHANGELOG.md).
 
 ## Versioning
 
-Consort is currently at **v0.12**. Per the versioning rule adopted at v0.11,
+Consort is currently at **v0.20**. Per the versioning rule adopted at v0.11,
 the version number changes whenever a valid Consort string's meaning
 changes (a new construct, a new symbol, or a parsing fix); pure
-documentation changes do not bump the version. See Section 8 of the spec
-for the full changelog.
-
-## Aside: Data With DIDs (DWD)
-
-> A note parked here for reference; it is adjacent to Consort's agent-to-agent
-> model rather than part of the language itself.
-
-Data With DIDs (DWD) inverts the entire Decentralized World Model (DWM). The
-service endpoint for a piece of data *is* the service endpoint of the agent
-that has authoritative control — sovereign control — over that data: the
-original data. That is, the agent with the authority to determine whether the
-actions can and should be performed, and then to decide to act on the DWD.
-
-No retrieval, no syncing, no replication, no duplication, no intermediate
-encoding / packing / unpacking. This solves a lot of issues.
-
-One option for specifying the DIDComm message payload — the pipeline of
-serial and parallel actions to be performed — is Consort Structured English
-for AI.
+documentation changes do not bump the version. See
+[`CHANGELOG.md`](CHANGELOG.md) for the full changelog.
 
 ## Contributing
 
@@ -271,7 +258,7 @@ own grammar as a deliberate, versioned decision (see
 
 ## License
 
-CONSORT Structured English for AI (0.12)
+CONSORT Markdown for Intelligent Coordination (0.20)
 Copyright © 2026 Michael Herman (Bindloss, Alberta, Canada)
 
 Released under the [MIT License](LICENSE).
