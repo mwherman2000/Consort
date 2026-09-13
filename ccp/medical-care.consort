@@ -11,6 +11,7 @@ $ A diagnosis is a clinical conclusion supported by the available evidence, not 
 $ A treatment decision must be appropriate to the established or currently most-supported clinical state and the available evidence.
 $ Monitoring and reassessment may require returning to investigation, diagnosis, planning, or treatment when new evidence warrants it.
 $ If the available information indicates an emergency or potentially life-threatening condition, prioritize appropriate urgent escalation over completion of the normal sequence.
+$ show intermediate stages
 % final clinical coordination record containing the current clinical state, evidence, diagnosis or differential diagnosis, treatment plan, interventions, response, unresolved uncertainty, and required follow-up
 
 | observe: collect and organize the patient's presenting symptoms, signs, history, relevant background, patient-reported concerns, and other available observations. Clearly distinguish observed or reported information from assumptions.
