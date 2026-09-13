@@ -155,15 +155,13 @@ nothing to install. To use it:
 | `\|` | Pipeline / Sequence | Run an ordered sequence of dependent stages |
 | `+` | Tool / Capability declaration | Declares that a task or entry requires a specific tool or external capability |
 
-All nine symbols are stable. `&` (Examples) and `~` (Style/Tone) were
-retired in v0.10 and are no longer part of the language. `+` was also
-retired in v0.10, then reintroduced in v0.17 with new, unrelated
-semantics (Tool / Capability declaration) — see `CHANGELOG.md` for the
-full history.
+All nine symbols are stable. `&` and `~` are not directive symbols — a
+line beginning with either is ordinary text, not a directive. See
+`CHANGELOG.md` for the full version history.
 
 ## Label References
 
-`{label}` and `{label}.field` — new in v0.12 — are a structural token for
+`{label}` and `{label}.field` are a structural token for
 naming a prior `^`/`|` entry's output, usable inside `|` stage task
 descriptions, inline overrides (`/$` `/%` `/@` `/*` `/+`), and `for-each`'s
 source position:
@@ -243,10 +241,9 @@ The version changelog lives separately, in [`CHANGELOG.md`](CHANGELOG.md).
 
 ## Versioning
 
-Consort is currently at **v0.20**. Per the versioning rule adopted at v0.11,
-the version number changes whenever a valid Consort string's meaning
-changes (a new construct, a new symbol, or a parsing fix); pure
-documentation changes do not bump the version. See
+Consort is currently at **v0.20**. The version number changes whenever a
+valid Consort string's meaning changes (a new construct, a new symbol, or
+a parsing fix); pure documentation changes do not bump the version. See
 [`CHANGELOG.md`](CHANGELOG.md) for the full changelog.
 
 ## Contributing
