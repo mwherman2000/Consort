@@ -1,5 +1,5 @@
 # CONSORT - Markdown for Intelligent Coordination
-Consort Markdown for Intelligent Coordination Super Prompt 
+Consort - Markdown for Intelligent Coordination Super Prompt 
 
 (previously known as Consort Structured English for AI Super Prompt DSL)
 
